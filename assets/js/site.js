@@ -168,7 +168,36 @@ function initItemPage() {
   });
 }
 
+function initShotViewer() {
+  const dialog = document.getElementById('shotViewer');
+  if (!dialog) return;
+  const img = document.getElementById('shotViewerImg');
+  const captionEl = document.getElementById('shotViewerCaption');
+  const closeBtn = dialog.querySelector('.shot-viewer-close');
+
+  document.querySelectorAll('.screenshot-trigger').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const sourceImg = btn.querySelector('img');
+      if (!sourceImg) return;
+      img.src = sourceImg.src;
+      img.alt = sourceImg.alt;
+      const fig = btn.closest('figure');
+      const cap = fig ? fig.querySelector('figcaption') : null;
+      captionEl.textContent = cap ? cap.textContent.replace(/\s+/g, ' ').trim() : '';
+      dialog.showModal();
+    });
+  });
+
+  if (closeBtn) closeBtn.addEventListener('click', () => dialog.close());
+
+  // Click outside the image area closes
+  dialog.addEventListener('click', (e) => {
+    if (e.target === dialog) dialog.close();
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   initIndexPage();
   initItemPage();
+  initShotViewer();
 });

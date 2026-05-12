@@ -86,22 +86,45 @@
 
   <div class="screenshot-grid">
     <figure class="screenshot">
-      <img src="/assets/img/omeka-screenshots/06-admin-template-detail.png" alt="Omeka S admin panel showing the Civil War Letter Resource Template with twelve Dublin Core property fields configured." />
+      <button type="button" class="screenshot-trigger" aria-label="Open larger view: Resource Template screenshot">
+        <img src="/assets/img/omeka-screenshots/06-admin-template-detail.png" alt="Omeka S admin panel showing the Civil War Letter Resource Template with twelve Dublin Core property fields configured." />
+        <span class="screenshot-hover">View larger</span>
+      </button>
       <figcaption><strong>Resource Template.</strong> The "Civil War Letter" template I authored, mapping twelve Dublin Core properties to curator-facing field labels.</figcaption>
     </figure>
     <figure class="screenshot">
-      <img src="/assets/img/omeka-screenshots/03-admin-item-detail.png" alt="Omeka S admin panel showing one letter with full Dublin Core metadata, item set association, and site association in the right sidebar." />
+      <button type="button" class="screenshot-trigger" aria-label="Open larger view: Item detail in admin screenshot">
+        <img src="/assets/img/omeka-screenshots/03-admin-item-detail.png" alt="Omeka S admin panel showing one letter with full Dublin Core metadata, item set association, and site association in the right sidebar." />
+        <span class="screenshot-hover">View larger</span>
+      </button>
       <figcaption><strong>Item detail in admin.</strong> One letter as a curator would see it: descriptive metadata in the main pane, item set and site associations in the sidebar.</figcaption>
     </figure>
     <figure class="screenshot">
-      <img src="/assets/img/omeka-screenshots/02-admin-items.png" alt="Omeka S admin items list showing six modeled letters." />
+      <button type="button" class="screenshot-trigger" aria-label="Open larger view: Items list screenshot">
+        <img src="/assets/img/omeka-screenshots/02-admin-items.png" alt="Omeka S admin items list showing six modeled letters." />
+        <span class="screenshot-hover">View larger</span>
+      </button>
       <figcaption><strong>Items list.</strong> The full set of six letters, browsable from the admin with title, creator, and date columns.</figcaption>
     </figure>
     <figure class="screenshot">
-      <img src="/assets/img/omeka-screenshots/12-public-item-detail.png" alt="Public-facing Omeka site showing one letter with clean typography and full Dublin Core metadata." />
+      <button type="button" class="screenshot-trigger" aria-label="Open larger view: Public-facing item detail screenshot">
+        <img src="/assets/img/omeka-screenshots/12-public-item-detail.png" alt="Public-facing Omeka site showing one letter with clean typography and full Dublin Core metadata." />
+        <span class="screenshot-hover">View larger</span>
+      </button>
       <figcaption><strong>Public site, item detail.</strong> The same letter as a visitor sees it through Omeka's default theme. Field labels come from the Resource Template; values from the item.</figcaption>
     </figure>
   </div>
+
+  <dialog class="shot-viewer" id="shotViewer" aria-labelledby="shotViewerTitle">
+    <div class="shot-viewer-head">
+      <h2 id="shotViewerTitle" class="shot-viewer-title">Screenshot detail</h2>
+      <button type="button" class="shot-viewer-close" aria-label="Close screenshot viewer">Close &times;</button>
+    </div>
+    <div class="shot-viewer-body">
+      <img id="shotViewerImg" alt="" />
+      <p id="shotViewerCaption" class="shot-viewer-caption"></p>
+    </div>
+  </dialog>
 
   <p>The point of running both alongside this prototype is to demonstrate the judgment call: Omeka's default theme is functional and library-coded, but for high-profile faculty editions a custom decoupled front-end (like this one) lets a project have its own visual identity while still benefiting from Omeka's curatorial workflow. Day-to-day in this role, either approach would be on the table; the right choice depends on the project's audience, lifespan, and budget.</p>
 

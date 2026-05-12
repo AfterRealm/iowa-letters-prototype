@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Methodology — Iowa Letters Digital Edition</title>
+<title>Methodology · Iowa Letters Digital Edition</title>
 <meta name="description" content="Standards, decisions, and methodology behind the Iowa Letters digital edition prototype." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -49,10 +49,10 @@
     <li><code>dcterms:title</code>, <code>dcterms:creator</code>, <code>dcterms:date</code>, <code>dcterms:type</code>, <code>dcterms:format</code>, <code>dcterms:language</code>, <code>dcterms:subject</code>, <code>dcterms:spatial</code>, <code>dcterms:temporal</code>, <code>dcterms:rights</code>, <code>dcterms:source</code></li>
   </ul>
 
-  <p>Where DCMI does not provide an exact match &mdash; for regimental affiliation, military company, and addressee &mdash; this prototype uses <strong>local properties</strong>. In production, these would be defined under a project-scoped vocabulary or, where appropriate, mapped to vocabularies like <a href="https://www.loc.gov/marc/" rel="external">MARC</a> relator terms or <a href="https://id.loc.gov/" rel="external">LOC Linked Data Service</a> identifiers.</p>
+  <p>Where DCMI does not provide an exact match for regimental affiliation, military company, and addressee, this prototype uses <strong>local properties</strong>. In production, these would be defined under a project-scoped vocabulary or, where appropriate, mapped to vocabularies like <a href="https://www.loc.gov/marc/" rel="external">MARC</a> relator terms or <a href="https://id.loc.gov/" rel="external">LOC Linked Data Service</a> identifiers.</p>
 
   <h2>Image delivery</h2>
-  <p>Item detail pages are structured to consume <strong>IIIF Presentation API 3.0 manifests</strong>. The IIIF approach was chosen because it is the de facto standard across academic libraries, museums, and archives for image delivery &mdash; it allows interoperable viewers (Mirador, Clover, Universal Viewer), supports deep zoom and annotation, and decouples image storage from presentation.</p>
+  <p>Item detail pages are structured to consume <strong>IIIF Presentation API 3.0 manifests</strong>. The IIIF approach was chosen because it is the de facto standard across academic libraries, museums, and archives for image delivery. It allows interoperable viewers (Mirador, Clover, Universal Viewer), supports deep zoom and annotation, and decouples image storage from presentation.</p>
   <p>In this prototype, manifest URLs point to public IIIF samples. A production build would consume manifests from the digitization workflow used by Special Collections.</p>
 
   <h2>Accessibility</h2>
@@ -73,7 +73,7 @@
   <p>The data layer in this prototype is a single JSON file shaped to mirror the response of an <strong>Omeka S</strong> instance's JSON-LD API. This was intentional: the front-end can be developed in parallel with the curatorial backend, and the same six items also exist in a real Omeka S install (described below) so that the migration from static JSON to live API is a one-line change in <code>site.js</code>.</p>
 
   <h2 id="omeka">The Omeka S backend behind this prototype</h2>
-  <p>The data shape this front-end consumes isn't notional &mdash; there is a real <strong>Omeka S 4.1.1</strong> instance running locally, modeled with the same Resource Template, Item Set, and six items shown on this site. Setting it up surfaced a useful problem worth describing: every public Docker image for Omeka S was either stale (the official <code>omeka/omeka-s</code> image had not been updated since 2017) or shipped with broken default configuration. Rather than build the demo on top of a misleading or outdated foundation, I wrote a custom <code>Dockerfile</code> against PHP 8.3 FPM, packaged the upstream Omeka S 4.1.1 release zip, and stood up a three-service stack (MariaDB + PHP-FPM + nginx) controlled by Docker Compose. I then populated the install entirely through Omeka S's REST API, which is the same way a faculty publishing project would automate content ingest.</p>
+  <p>The data shape this front-end consumes isn't notional. There is a real <strong>Omeka S 4.1.1</strong> instance running locally, modeled with the same Resource Template, Item Set, and six items shown on this site. Setting it up surfaced a useful problem worth describing: every public Docker image for Omeka S was either stale (the official <code>omeka/omeka-s</code> image had not been updated since 2017) or shipped with broken default configuration. Rather than build the demo on top of a misleading or outdated foundation, I wrote a custom <code>Dockerfile</code> against PHP 8.3 FPM, packaged the upstream Omeka S 4.1.1 release zip, and stood up a three-service stack (MariaDB + PHP-FPM + nginx) controlled by Docker Compose. I then populated the install entirely through Omeka S's REST API, which is the same way a faculty publishing project would automate content ingest.</p>
 
   <div class="live-url-banner">
     <span class="label">Live Omeka S 4.1.1 backend</span>
@@ -87,19 +87,19 @@
   <div class="screenshot-grid">
     <figure class="screenshot">
       <img src="/assets/img/omeka-screenshots/06-admin-template-detail.png" alt="Omeka S admin panel showing the Civil War Letter Resource Template with twelve Dublin Core property fields configured." />
-      <figcaption><strong>Resource Template &mdash;</strong> The "Civil War Letter" template I authored, mapping twelve Dublin Core properties to curator-facing field labels.</figcaption>
+      <figcaption><strong>Resource Template.</strong> The "Civil War Letter" template I authored, mapping twelve Dublin Core properties to curator-facing field labels.</figcaption>
     </figure>
     <figure class="screenshot">
       <img src="/assets/img/omeka-screenshots/03-admin-item-detail.png" alt="Omeka S admin panel showing one letter with full Dublin Core metadata, item set association, and site association in the right sidebar." />
-      <figcaption><strong>Item detail in admin &mdash;</strong> One letter as a curator would see it: descriptive metadata in the main pane, item set and site associations in the sidebar.</figcaption>
+      <figcaption><strong>Item detail in admin.</strong> One letter as a curator would see it: descriptive metadata in the main pane, item set and site associations in the sidebar.</figcaption>
     </figure>
     <figure class="screenshot">
       <img src="/assets/img/omeka-screenshots/02-admin-items.png" alt="Omeka S admin items list showing six modeled letters." />
-      <figcaption><strong>Items list &mdash;</strong> The full set of six letters, browsable from the admin with title, creator, and date columns.</figcaption>
+      <figcaption><strong>Items list.</strong> The full set of six letters, browsable from the admin with title, creator, and date columns.</figcaption>
     </figure>
     <figure class="screenshot">
       <img src="/assets/img/omeka-screenshots/12-public-item-detail.png" alt="Public-facing Omeka site showing one letter with clean typography and full Dublin Core metadata." />
-      <figcaption><strong>Public site &mdash; item detail &mdash;</strong> The same letter as a visitor sees it through Omeka's default theme. Field labels come from the Resource Template; values from the item.</figcaption>
+      <figcaption><strong>Public site, item detail.</strong> The same letter as a visitor sees it through Omeka's default theme. Field labels come from the Resource Template; values from the item.</figcaption>
     </figure>
   </div>
 
@@ -108,18 +108,18 @@
   <h2>What lives in production that does not live here</h2>
   <p>The Omeka S backend is in place (linked above). What a faculty-grade production deployment would add on top of what's running here:</p>
   <ul>
-    <li><strong>Role-based curatorial access</strong> in Omeka for the faculty PI and Special Collections editor &mdash; the current install has a single global admin</li>
+    <li><strong>Role-based curatorial access</strong> in Omeka for the faculty PI and Special Collections editor. The current install has a single global admin.</li>
     <li>A <strong>digitization-to-IIIF pipeline</strong> producing real Presentation API 3.0 manifests from manuscript scans, replacing the placeholder thumbnails</li>
-    <li>An <strong>OAI-PMH endpoint</strong> exposing the edition's metadata for harvest by aggregators (DPLA, etc.) &mdash; available in Omeka as a module, not yet installed here</li>
+    <li>An <strong>OAI-PMH endpoint</strong> exposing the edition's metadata for harvest by aggregators (DPLA, etc.). Available in Omeka as a module, not yet installed here.</li>
     <li>A small <strong>citation export</strong> feature (BibTeX, RIS, Chicago note-bibliography)</li>
     <li>An <strong>editorial annotation layer</strong> using the W3C Web Annotation Data Model, allowing scholars to annotate passages in the transcriptions</li>
     <li>Real <strong>transcriptions and curatorial review</strong> against actual primary-source holdings</li>
   </ul>
 
   <h2>Sustainability</h2>
-  <p>The prototype front-end here has <strong>no build step</strong> &mdash; plain HTML, CSS, and JavaScript that can be served from anywhere and survive any platform churn. The Omeka S backend does have a build step (a custom <code>Dockerfile</code> that compiles the image from the upstream Omeka release zip), but the build is fully reproducible from version-controlled source: anyone with Docker can clone the <a href="https://github.com/AfterRealm/iowa-omeka-lab">backend repo</a> and reproduce the same install in under five minutes.</p>
+  <p>The prototype front-end here has <strong>no build step</strong>. It is plain HTML, CSS, and JavaScript that can be served from anywhere and survive any platform churn. The Omeka S backend does have a build step (a custom <code>Dockerfile</code> that compiles the image from the upstream Omeka release zip), but the build is fully reproducible from version-controlled source: anyone with Docker can clone the <a href="https://github.com/AfterRealm/iowa-omeka-lab">backend repo</a> and reproduce the same install in under five minutes.</p>
 
-  <p>A production rewrite on Astro 5 would introduce a small build step on the front-end side as well, but Astro compiles to static files &mdash; so the deployed output is still platform-agnostic. The data model uses an open vocabulary (DCMI) so that if the front-end is ever rewritten or migrated to a different CMS, the underlying metadata travels intact. Documentation lives alongside the code, in the same repository, version-controlled.</p>
+  <p>A production rewrite on Astro 5 would introduce a small build step on the front-end side as well, but Astro compiles to static files, so the deployed output is still platform-agnostic. The data model uses an open vocabulary (DCMI) so that if the front-end is ever rewritten or migrated to a different CMS, the underlying metadata travels intact. Documentation lives alongside the code, in the same repository, version-controlled.</p>
 
 </main>
 

@@ -1,4 +1,4 @@
-// Iowa Letters — Digital Edition Prototype
+// Iowa Letters · Digital Edition Prototype
 // Front-end logic for item index, item detail rendering, and search/filter.
 
 const DATA_URL = '/data/items.json';
@@ -161,7 +161,7 @@ function initItemPage() {
       detailEl.innerHTML = `<p>Item ${escapeHtml(id)} not found. <a href="/items.html">Browse all letters.</a></p>`;
       return;
     }
-    document.title = `${item['dcterms:title']} — Iowa Letters`;
+    document.title = `${item['dcterms:title']} · Iowa Letters`;
     detailEl.innerHTML = renderItemDetail(item);
   }).catch(err => {
     detailEl.innerHTML = `<p class="muted">Could not load item: ${escapeHtml(err.message)}</p>`;

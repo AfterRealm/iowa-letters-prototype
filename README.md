@@ -1,4 +1,4 @@
-# Iowa Letters — A Civil War Digital Edition (Prototype)
+# Iowa Letters · A Civil War Digital Edition (Prototype)
 
 A small prototype digital edition of letters home from Iowa volunteers serving in the American Civil War.
 
@@ -20,10 +20,10 @@ A finished publication. Transcriptions are fabricated for the portfolio piece. T
 
 ## Stack
 
-- **HTML5, CSS3, vanilla JavaScript** — no build step in the prototype phase, for maximum portability
-- **Dublin Core Terms (DCMI)** — descriptive metadata vocabulary
-- **IIIF Presentation API 3.0** — image delivery readiness (manifests are placeholders in this prototype)
-- **WCAG 2.2 AA** — accessibility target, audited end-to-end with [Curb Cut](https://github.com/AfterRealm) (axe-core), 100/100 across all pages
+- **HTML5, CSS3, vanilla JavaScript.** No build step in the prototype phase, for maximum portability.
+- **Dublin Core Terms (DCMI)** for descriptive metadata vocabulary.
+- **IIIF Presentation API 3.0** for image delivery readiness (manifests are placeholders in this prototype).
+- **WCAG 2.2 AA** accessibility target, audited end-to-end with [Curb Cut](https://github.com/AfterRealm) (axe-core). 100/100 across all pages.
 
 ## Production version
 

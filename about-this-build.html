@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>About this Build — Iowa Letters Digital Edition</title>
+<meta name="description" content="A portfolio piece for the University of Iowa Libraries Web Application Developer (Digital Scholarship & Publishing Support) role." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/assets/css/site.css" />
+<meta name="robots" content="noindex, nofollow" />
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<div class="demo-banner">
+  This is a portfolio prototype built for the University of Iowa Libraries Web Application Developer position.
+</div>
+
+<header class="site-banner">
+  <div class="container">
+    <div class="branding">
+      <div class="institution">University of Iowa Libraries · Digital Scholarship &amp; Publishing Studio</div>
+      <p class="edition-title">Iowa Letters</p>
+      <p class="tagline">A Digital Edition of Civil War Correspondence from Iowa Volunteers</p>
+    </div>
+  </div>
+  <nav class="primary" aria-label="Primary">
+    <div class="container">
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/items.html">Browse Letters</a></li>
+        <li><a href="/methodology.html">Methodology</a></li>
+        <li><a href="/about-this-build.html" aria-current="page">About this Build</a></li>
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<main id="main" tabindex="-1">
+
+  <h1>About this build</h1>
+  <p class="lede">A short note from the applicant. This prototype site &mdash; both the content and the build &mdash; is my cover letter for the Web Application Developer (Digital Scholarship &amp; Publishing Support) position at Libraries Information Technology.</p>
+
+  <h2>Why I built this instead of a cover letter</h2>
+  <p>A cover letter PDF can describe a way of working. A working prototype <em>shows</em> one. I wanted you to be able to read the posting's specific responsibilities &mdash; "implementing and supporting CMS&hellip; commonly used in library and digital publishing contexts, such as Omeka," "modernizing existing applications," "contributing to system analysis and technical design activities based on requirements defined by the Research Manager," "applying established development standards" &mdash; and then open this site and see those exact responsibilities embodied in a small but real artifact.</p>
+
+  <p>I am not currently a Libraries developer. This prototype is my attempt to demonstrate, in the most direct way I know how, what working with me on a DSPS project might look like in its first delivered milestone.</p>
+
+  <h2>How I would have approached this if it were a real DSPS project</h2>
+
+  <p>Reading the posting carefully, the developer in this role works in partnership with the Research Manager in DSPS Studio &mdash; who serves as Product Owner and Business Analyst. That framing matters. It means the developer should be thinking about <em>discovery</em>, <em>requirements clarity</em>, and <em>maintainability</em> before they think about code. Here is the rough shape of how I would have worked this project:</p>
+
+  <div class="decision-log">
+
+    <div class="decision">
+      <div class="label">Step 1 · Discovery</div>
+      <h3>Questions I would have asked the Research Manager and the faculty PI before writing a line of code</h3>
+      <ul>
+        <li>Who is the primary audience &mdash; scholarly, undergraduate-teaching, public, or all three?</li>
+        <li>What is the lifespan of this edition? Is it tied to a grant cycle, or expected to live for ten or twenty years?</li>
+        <li>Where will the primary source images come from, and what is the digitization pipeline that produces IIIF manifests for them?</li>
+        <li>Who maintains this in three years, in five years, after the PI retires?</li>
+        <li>Are there accessibility requirements beyond WCAG 2.2 AA &mdash; for example, requirements specific to a funding body?</li>
+        <li>Does the project need to expose its metadata for harvest by aggregators (DPLA, OAI-PMH endpoint)?</li>
+        <li>Are there comparable editions already published by Iowa Libraries that this should look and feel consistent with?</li>
+      </ul>
+    </div>
+
+    <div class="decision">
+      <div class="label">Step 2 · System design</div>
+      <h3>The system shape I would have proposed for review by the Application Development lead</h3>
+      <dl>
+        <dt>Backend</dt>
+        <dd>An Omeka S instance hosting items, item sets, resource templates. Curatorial work happens in Omeka's admin UI by Special Collections staff with role-scoped access. Faculty PI gets a curator role to review and approve before publication.</dd>
+        <dt>Front-end</dt>
+        <dd>An Astro 5 site (matching the pattern LIT is currently using on newer digital edition projects) consuming the Omeka S JSON-LD API. Static-site-generated at build time for performance, accessibility, and long-term sustainability.</dd>
+        <dt>Image delivery</dt>
+        <dd>IIIF Presentation API 3.0 manifests served from the existing digitization pipeline. Front-end uses Mirador or Clover Viewer.</dd>
+        <dt>Search</dt>
+        <dd>Client-side fuzzy search for small editions (under a few thousand items). Server-side indexed search (via Omeka S's native search, or an external index) for larger editions.</dd>
+        <dt>Deploy</dt>
+        <dd>Astro front-end on Cloudflare Pages or a Libraries-managed static host, deployed via GitHub Actions on push. Omeka S backend on whatever infrastructure LIT prefers (Reclaim Hosting, internal VM, etc.).</dd>
+      </dl>
+    </div>
+
+    <div class="decision">
+      <div class="label">Step 3 · Standards adherence</div>
+      <h3>What I would have checked against before requesting review</h3>
+      <ul>
+        <li>WCAG 2.2 AA accessibility audit (axe DevTools + manual keyboard + screen reader smoke test)</li>
+        <li>Dublin Core Terms used correctly; local properties documented in a project vocabulary file in the repo</li>
+        <li>IIIF manifests validated against the IIIF 3.0 spec</li>
+        <li>README and methodology page describing standards used, decisions made, and trade-offs taken &mdash; in plain language for the faculty PI and a future maintainer</li>
+        <li>Git history clean, semantic commit messages, no secrets committed</li>
+      </ul>
+    </div>
+
+    <div class="decision">
+      <div class="label">Step 4 · The Omeka S backend, actually built</div>
+      <h3>What I stood up alongside this prototype, so the claim isn't notional</h3>
+      <p>Rather than describe the Omeka S backend in the abstract, I built it. The same six letters in the same Resource Template are running in a real <strong>Omeka S 4.1.1</strong> instance &mdash; modeled in Dublin Core, organized in an Item Set, published through a Site, and exposed via the REST API I used to populate them programmatically.</p>
+      <ul>
+        <li>Custom <code>Dockerfile</code> on PHP 8.3 FPM with all required extensions, built because every public Omeka S Docker image was stale or misconfigured</li>
+        <li>Three-service Compose stack: MariaDB, PHP-FPM, nginx</li>
+        <li>One Resource Template ("Civil War Letter") with twelve Dublin Core properties</li>
+        <li>One Item Set ("Iowa Letters, 1862-1865") grouping the collection</li>
+        <li>Six Items, each modeled in full Dublin Core</li>
+        <li>One Site with a custom homepage and the item set attached</li>
+        <li>All authored programmatically against Omeka's REST API &mdash; the same automation surface a faculty publishing pipeline would use</li>
+      </ul>
+      <p>It is live at <a href="https://iowa.dev.01.ngrok.dev/s/iowa-letters" target="_blank" rel="noopener">https://iowa.dev.01.ngrok.dev/s/iowa-letters</a> for as long as my development machine is up. Screenshots of the admin and public side are embedded on the <a href="/methodology.html#omeka">methodology page</a>.</p>
+    </div>
+
+    <div class="decision">
+      <div class="label">Step 5 · Honest unknowns</div>
+      <h3>Where I would lean on mentorship from the Application Development lead</h3>
+      <p>The job description explicitly says this role receives guidance and mentorship from the Application Development lead. I read that as an invitation to be honest about what I would want help with, rather than to pretend I have every answer.</p>
+      <dl>
+        <dt>Drupal 7 to Islandora Modern migrations</dt>
+        <dd>I understand the general shape of the migration &mdash; Drupal 7 to Drupal 10/11 underneath, content audit, Migrate API, parallel staging, read-only cutover &mdash; but I have not personally run an Islandora migration. I would expect to shadow one before I led one.</dd>
+        <dt>Omeka S module development at depth</dt>
+        <dd>I have read the Omeka S module architecture and the Laminas patterns it sits on. I am comfortable building a small module against documentation; I would want code review on my first real module before it shipped to a production site.</dd>
+        <dt>Institutional infrastructure conventions</dt>
+        <dd>Things like the preferred hosting model for Omeka instances at Iowa, how user provisioning works for faculty PIs, what the SSO story looks like for curatorial accounts, and what the established Git workflow conventions are inside LIT. These are the kind of things I would want to learn early from the lead and from the existing repos.</dd>
+      </dl>
+    </div>
+
+    <div class="decision">
+      <div class="label">Step 5 · Sustainability and handoff</div>
+      <h3>How I would have thought about the next developer who touches this site</h3>
+      <ul>
+        <li>A README that explains <em>why</em> the choices were made, not just <em>what</em> the choices were</li>
+        <li>The methodology page kept in the same repo as the code, version-controlled together</li>
+        <li>A migration note in the README explaining how to swap the JSON data file for a live Omeka S API call (here, that swap is a one-line change in <code>site.js</code>)</li>
+        <li>Comments at non-obvious decision points, not anywhere else</li>
+        <li>An open issue list for known limitations</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <h2>What this prototype is not</h2>
+  <p>It is not a finished publication. The transcriptions are fabricated. There is no editorial workflow, no faculty review cycle, no real corpus, no actual digitization pipeline yet. The point is the <em>shape</em> of the work, not the scholarly content. The Omeka S backend is real and runs the same six items, but it too uses the illustrative metadata above; a production version would replace those with actual Special Collections holdings reviewed by curators.</p>
+
+  <h2>About me</h2>
+  <p>I am Meredith Sealy, a self-taught web application developer based in North Ridgeville, Ohio. I build web applications across modern stacks &mdash; Astro 5, Node.js / Express, TypeScript, vanilla CSS &mdash; with a focus on accessibility, sustainability, and modernization of legacy tooling. Over the past year I have shipped a public portfolio site (passing a full WCAG 2.2 AA audit), an automated accessibility-audit tool, a Node.js + Express dashboard application I use daily, and a port of a command-line tool to a native .NET 9 / WPF Windows desktop application.</p>
+
+  <p>I do not hold a bachelor's degree in computer science. I lean on the posting's allowance for "an equivalent combination of education and relevant professional experience," and on the portfolio I can point to as evidence. My background outside web work &mdash; quality assurance in a regulated continuous-mill environment, multi-location operations management &mdash; built a comfort with documentation standards, multi-stakeholder coordination, and supporting non-technical colleagues that translates into a team-based development environment.</p>
+
+  <p>I am open to relocation to Iowa, and to the on-campus / hybrid arrangement described in the posting.</p>
+
+  <h2>Materials</h2>
+  <ul>
+    <li><strong>Portfolio:</strong> <a href="https://meredithsealyportfolio.netlify.app">meredithsealyportfolio.netlify.app</a></li>
+    <li><strong>GitHub:</strong> <a href="https://github.com/AfterRealm">github.com/AfterRealm</a></li>
+    <li><strong>This prototype's source code:</strong> <a href="https://github.com/AfterRealm/iowa-letters-prototype">github.com/AfterRealm/iowa-letters-prototype</a></li>
+    <li><strong>The Omeka S backend's Dockerfile + populate script:</strong> <a href="https://github.com/AfterRealm/iowa-omeka-lab">github.com/AfterRealm/iowa-omeka-lab</a></li>
+    <li><strong>Live Omeka S 4.1.1 backend:</strong> <a href="https://iowa.dev.01.ngrok.dev/s/iowa-letters">iowa.dev.01.ngrok.dev/s/iowa-letters</a></li>
+    <li>Resume PDF &mdash; uploaded with this application</li>
+    <li>Email &mdash; <a href="mailto:meredithsealycasa@gmail.com">meredithsealycasa@gmail.com</a></li>
+    <li>Phone &mdash; (440) 984-1813</li>
+  </ul>
+
+  <p style="margin-top: 2rem;">Thank you for opening this and reading it. I would welcome the chance to talk through how I might contribute to LIT's work.</p>
+
+  <p>&mdash; Meredith Sealy</p>
+
+</main>
+
+<footer class="site-footer">
+  <div class="inner">
+    <div>
+      <h4>About this prototype</h4>
+      <p>Built by Meredith Sealy as a portfolio piece for the Web Application Developer (Digital Scholarship &amp; Publishing Support) role at University of Iowa Libraries Information Technology, May 2026.</p>
+    </div>
+    <div>
+      <h4>Contact</h4>
+      <p><a href="mailto:meredithsealycasa@gmail.com">meredithsealycasa@gmail.com</a></p>
+      <p><a href="https://meredithsealyportfolio.netlify.app">Portfolio</a> · <a href="https://github.com/AfterRealm">GitHub</a></p>
+    </div>
+  </div>
+</footer>
+
+<script src="/assets/js/site.js"></script>
+</body>
+</html>

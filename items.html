@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Browse Letters — Iowa Letters Digital Edition</title>
+<meta name="description" content="Browse all letters in the Iowa Letters Civil War digital edition prototype. Search by name, date, regiment, and subject." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/assets/css/site.css" />
+<meta name="robots" content="noindex, nofollow" />
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<div class="demo-banner">
+  This is a portfolio prototype built for the University of Iowa Libraries Web Application Developer position. <a href="/about-this-build.html">Build notes.</a>
+</div>
+
+<header class="site-banner">
+  <div class="container">
+    <div class="branding">
+      <div class="institution">University of Iowa Libraries · Digital Scholarship &amp; Publishing Studio</div>
+      <p class="edition-title">Iowa Letters</p>
+      <p class="tagline">A Digital Edition of Civil War Correspondence from Iowa Volunteers</p>
+    </div>
+  </div>
+  <nav class="primary" aria-label="Primary">
+    <div class="container">
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/items.html" aria-current="page">Browse Letters</a></li>
+        <li><a href="/methodology.html">Methodology</a></li>
+        <li><a href="/about-this-build.html">About this Build</a></li>
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<main id="main" tabindex="-1">
+
+  <h1>Browse the letters</h1>
+  <p class="lede">Six illustrative letters from Iowa volunteers, 1862&ndash;1865. Use the search and filters to narrow the set. Click any title for full descriptive metadata and transcription.</p>
+
+  <form class="search-row" role="search" aria-label="Search letters" onsubmit="event.preventDefault();">
+    <label class="sr-only" for="q">Search text</label>
+    <input type="search" id="q" placeholder="Search by name, place, regiment, or transcription text&hellip;" aria-label="Search letters" />
+
+    <label class="sr-only" for="year">Filter by year</label>
+    <select id="year" aria-label="Filter by year">
+      <option value="">All years</option>
+      <option value="1862">1862</option>
+      <option value="1863">1863</option>
+      <option value="1864">1864</option>
+      <option value="1865">1865</option>
+    </select>
+
+    <label class="sr-only" for="regiment">Filter by regiment</label>
+    <select id="regiment" aria-label="Filter by regiment">
+      <option value="">All regiments</option>
+      <option value="16th Iowa Volunteer Infantry">16th Iowa Volunteer Infantry</option>
+    </select>
+  </form>
+
+  <p class="item-count" id="item-count" aria-live="polite">Loading letters&hellip;</p>
+
+  <section id="item-list" aria-label="Letter results"></section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="inner">
+    <div>
+      <h4>About this prototype</h4>
+      <p>Built as a portfolio piece for the Web Application Developer (Digital Scholarship &amp; Publishing Support) role at University of Iowa Libraries Information Technology, May 2026.</p>
+      <p><a href="/about-this-build.html">Read the build notes &rarr;</a></p>
+    </div>
+    <div>
+      <h4>Standards used</h4>
+      <p>Dublin Core Terms (DCMI) · IIIF Presentation API 3.0 · WCAG 2.2 AA · Semantic HTML5</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+</style>
+<script src="/assets/js/site.js"></script>
+</body>
+</html>

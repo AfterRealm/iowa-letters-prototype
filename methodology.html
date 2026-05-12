@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Methodology — Iowa Letters Digital Edition</title>
+<meta name="description" content="Standards, decisions, and methodology behind the Iowa Letters digital edition prototype." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/assets/css/site.css" />
+<meta name="robots" content="noindex, nofollow" />
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<div class="demo-banner">
+  This is a portfolio prototype built for the University of Iowa Libraries Web Application Developer position. <a href="/about-this-build.html">Build notes.</a>
+</div>
+
+<header class="site-banner">
+  <div class="container">
+    <div class="branding">
+      <div class="institution">University of Iowa Libraries · Digital Scholarship &amp; Publishing Studio</div>
+      <p class="edition-title">Iowa Letters</p>
+      <p class="tagline">A Digital Edition of Civil War Correspondence from Iowa Volunteers</p>
+    </div>
+  </div>
+  <nav class="primary" aria-label="Primary">
+    <div class="container">
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/items.html">Browse Letters</a></li>
+        <li><a href="/methodology.html" aria-current="page">Methodology</a></li>
+        <li><a href="/about-this-build.html">About this Build</a></li>
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<main id="main" tabindex="-1">
+
+  <h1>Methodology</h1>
+  <p class="lede">A working note on the standards, decisions, and trade-offs behind this prototype. Written for a Library audience: faculty PIs, Special Collections curators, and the LIT staff who would maintain it.</p>
+
+  <h2>Descriptive metadata</h2>
+  <p>Every letter in this edition is modeled against the <strong>Dublin Core Terms (DCMI) vocabulary</strong>. DCMI was chosen because it is library-native, interoperable with other library systems through OAI-PMH and JSON-LD, and well understood by curators across institutions. Specific properties used:</p>
+  <ul>
+    <li><code>dcterms:title</code>, <code>dcterms:creator</code>, <code>dcterms:date</code>, <code>dcterms:type</code>, <code>dcterms:format</code>, <code>dcterms:language</code>, <code>dcterms:subject</code>, <code>dcterms:spatial</code>, <code>dcterms:temporal</code>, <code>dcterms:rights</code>, <code>dcterms:source</code></li>
+  </ul>
+
+  <p>Where DCMI does not provide an exact match &mdash; for regimental affiliation, military company, and addressee &mdash; this prototype uses <strong>local properties</strong>. In production, these would be defined under a project-scoped vocabulary or, where appropriate, mapped to vocabularies like <a href="https://www.loc.gov/marc/" rel="external">MARC</a> relator terms or <a href="https://id.loc.gov/" rel="external">LOC Linked Data Service</a> identifiers.</p>
+
+  <h2>Image delivery</h2>
+  <p>Item detail pages are structured to consume <strong>IIIF Presentation API 3.0 manifests</strong>. The IIIF approach was chosen because it is the de facto standard across academic libraries, museums, and archives for image delivery &mdash; it allows interoperable viewers (Mirador, Clover, Universal Viewer), supports deep zoom and annotation, and decouples image storage from presentation.</p>
+  <p>In this prototype, manifest URLs point to public IIIF samples. A production build would consume manifests from the digitization workflow used by Special Collections.</p>
+
+  <h2>Accessibility</h2>
+  <p>This prototype is built against <strong>WCAG 2.2 Level AA</strong>. Specific decisions:</p>
+  <ul>
+    <li>Semantic HTML5 throughout (<code>main</code>, <code>nav</code>, <code>article</code>, <code>section</code>, descriptive headings)</li>
+    <li>Skip-to-content link as the first focusable element on every page</li>
+    <li>Visible focus indicators on all interactive elements (<code>:focus-visible</code> outline, two-pixel)</li>
+    <li>Color contrast verified against WCAG 2.2 AA thresholds (text on paper background &gt; 9:1; gold accents on dark only where decorative)</li>
+    <li>Alt text on all images; transcriptions present for every letter so the content is accessible without the image</li>
+    <li>Forms with explicit labels and ARIA attributes; <code>aria-live</code> regions for dynamic search results</li>
+    <li>Keyboard navigable end-to-end</li>
+  </ul>
+
+  <h2>Why this stack</h2>
+  <p>This prototype is built in <strong>vanilla HTML, CSS, and JavaScript</strong> for portability and simplicity in the prototype phase. A production version of this edition would be built on <strong>Astro 5 with Bootstrap 5</strong> to match the pattern Libraries Information Technology is currently using on newer digital edition projects, and to take advantage of Astro's static-site generation for performance and long-term maintainability.</p>
+  <p>The data layer in this prototype is a single JSON file shaped to mirror the response of an <strong>Omeka S</strong> instance's JSON-LD API. This was intentional: it lets the front-end be developed in parallel with backend curatorial work, and lets the same front-end migrate cleanly to a real Omeka S backend once the curatorial workflow is in place.</p>
+
+  <h2 id="omeka">The Omeka S backend behind this prototype</h2>
+  <p>The data shape this front-end consumes isn't notional &mdash; there is a real <strong>Omeka S 4.1.1</strong> instance running locally, modeled with the same Resource Template, Item Set, and six items shown on this site. Setting it up surfaced a useful problem worth describing: every public Docker image for Omeka S was either stale (the official <code>omeka/omeka-s</code> image had not been updated since 2017) or shipped with broken default configuration. Rather than build the demo on top of a misleading or outdated foundation, I wrote a custom <code>Dockerfile</code> against PHP 8.3 FPM, packaged the upstream Omeka S 4.1.1 release zip, and stood up a three-service stack (MariaDB + PHP-FPM + nginx) controlled by Docker Compose. I then populated the install entirely through Omeka S's REST API, which is the same way a faculty publishing project would automate content ingest.</p>
+
+  <div class="live-url-banner">
+    <span class="label">Live Omeka S 4.1.1 backend</span>
+    <a href="https://iowa.dev.01.ngrok.dev/s/iowa-letters" target="_blank" rel="noopener">https://iowa.dev.01.ngrok.dev/s/iowa-letters</a><br>
+    <span style="font-size: 0.85rem; color: var(--ink-soft); font-style: italic;">The same data this prototype models, presented through Omeka's default theme. Tunneled from a local development instance via ngrok.</span>
+  </div>
+
+  <h3>Selected screenshots</h3>
+  <p class="text-small muted">Captured against the live Omeka S 4.1.1 admin and public-site, May 2026.</p>
+
+  <div class="screenshot-grid">
+    <figure class="screenshot">
+      <img src="/assets/img/omeka-screenshots/06-admin-template-detail.png" alt="Omeka S admin panel showing the Civil War Letter Resource Template with twelve Dublin Core property fields configured." />
+      <figcaption><strong>Resource Template &mdash;</strong> The "Civil War Letter" template I authored, mapping twelve Dublin Core properties to curator-facing field labels.</figcaption>
+    </figure>
+    <figure class="screenshot">
+      <img src="/assets/img/omeka-screenshots/03-admin-item-detail.png" alt="Omeka S admin panel showing one letter with full Dublin Core metadata, item set association, and site association in the right sidebar." />
+      <figcaption><strong>Item detail in admin &mdash;</strong> One letter as a curator would see it: descriptive metadata in the main pane, item set and site associations in the sidebar.</figcaption>
+    </figure>
+    <figure class="screenshot">
+      <img src="/assets/img/omeka-screenshots/02-admin-items.png" alt="Omeka S admin items list showing six modeled letters." />
+      <figcaption><strong>Items list &mdash;</strong> The full set of six letters, browsable from the admin with title, creator, and date columns.</figcaption>
+    </figure>
+    <figure class="screenshot">
+      <img src="/assets/img/omeka-screenshots/12-public-item-detail.png" alt="Public-facing Omeka site showing one letter with clean typography and full Dublin Core metadata." />
+      <figcaption><strong>Public site &mdash; item detail &mdash;</strong> The same letter as a visitor sees it through Omeka's default theme. Field labels come from the Resource Template; values from the item.</figcaption>
+    </figure>
+  </div>
+
+  <p>The point of running both alongside this prototype is to demonstrate the judgment call: Omeka's default theme is functional and library-coded, but for high-profile faculty editions a custom decoupled front-end (like this one) lets a project have its own visual identity while still benefiting from Omeka's curatorial workflow. Day-to-day in this role, either approach would be on the table; the right choice depends on the project's audience, lifespan, and budget.</p>
+
+  <h2>What lives in production that does not live here</h2>
+  <ul>
+    <li>An <strong>Omeka S installation</strong> hosting items, item sets, and resource templates &mdash; with role-based curatorial access for the faculty PI and Special Collections editor</li>
+    <li>A <strong>digitization-to-IIIF pipeline</strong> feeding manifests to the front-end</li>
+    <li><strong>OAI-PMH endpoint</strong> exposing the edition's metadata for harvest by aggregators (DPLA, etc.)</li>
+    <li>A small <strong>citation export</strong> feature (BibTeX, RIS, Chicago note-bibliography)</li>
+    <li>An <strong>editorial annotation layer</strong> using the W3C Web Annotation Data Model, allowing scholars to annotate passages in the transcriptions</li>
+  </ul>
+
+  <h2>Sustainability</h2>
+  <p>This prototype intentionally has <strong>no build step</strong> &mdash; it is plain static files that can be served from anywhere and survive any platform churn. The production version on Astro 5 would compile to static files too. The data model uses an open vocabulary (DCMI) so that if the front-end is ever rewritten, the underlying metadata travels intact to whatever comes next. Documentation lives alongside the code, in the same repository, version-controlled.</p>
+
+</main>
+
+<footer class="site-footer">
+  <div class="inner">
+    <div>
+      <h4>About this prototype</h4>
+      <p>Built as a portfolio piece for the Web Application Developer (Digital Scholarship &amp; Publishing Support) role at University of Iowa Libraries Information Technology, May 2026.</p>
+      <p><a href="/about-this-build.html">Read the build notes &rarr;</a></p>
+    </div>
+    <div>
+      <h4>Standards used</h4>
+      <p>Dublin Core Terms (DCMI) · IIIF Presentation API 3.0 · WCAG 2.2 AA · Semantic HTML5</p>
+    </div>
+  </div>
+</footer>
+
+<script src="/assets/js/site.js"></script>
+</body>
+</html>

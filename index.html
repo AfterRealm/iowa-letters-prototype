@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Iowa Letters — A Civil War Digital Edition</title>
+<meta name="description" content="A small digital edition of letters written by Iowa volunteers during the American Civil War. A prototype built to demonstrate metadata modeling, accessibility, and front-end patterns for scholarly publishing in a library setting." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/assets/css/site.css" />
+<meta name="robots" content="noindex, nofollow" />
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<div class="demo-banner">
+  This is a portfolio prototype built by an applicant for the University of Iowa Libraries Web Application Developer position. <a href="/about-this-build.html">Read the build notes.</a>
+</div>
+
+<header class="site-banner">
+  <div class="container">
+    <div class="branding">
+      <div class="institution">University of Iowa Libraries · Digital Scholarship &amp; Publishing Studio</div>
+      <p class="edition-title">Iowa Letters</p>
+      <p class="tagline">A Digital Edition of Civil War Correspondence from Iowa Volunteers</p>
+    </div>
+  </div>
+  <nav class="primary" aria-label="Primary">
+    <div class="container">
+      <ul>
+        <li><a href="/" aria-current="page">Home</a></li>
+        <li><a href="/items.html">Browse Letters</a></li>
+        <li><a href="/methodology.html">Methodology</a></li>
+        <li><a href="/about-this-build.html">About this Build</a></li>
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<main id="main" tabindex="-1">
+
+  <h1>Iowa Letters</h1>
+  <p class="lede">A small scholarly digital edition of letters home from Iowa volunteers serving in the American Civil War, built as a prototype demonstrating how a Libraries IT developer would partner with the Digital Scholarship and Publishing Studio to deliver a faculty-led digital edition project.</p>
+
+  <h2>About this edition</h2>
+  <p>Between 1861 and 1865 the State of Iowa raised forty-eight infantry regiments and sent more than seventy-five thousand volunteers into Union service &mdash; a higher per-capita contribution than any other state. The letters those soldiers wrote home, when they have survived, are kept across a scattered set of collections at the University of Iowa Libraries Special Collections, the State Historical Society of Iowa, and several regional historical societies.</p>
+
+  <p>This prototype digital edition presents a small curated sample of such letters, modeled with full descriptive metadata, presented with their transcriptions and digitized scans, and made searchable across creator, date, regiment, and subject. It is intended as a working illustration &mdash; what a faculty-partnered digital edition project might look like in its first delivered milestone.</p>
+
+  <div class="callout">
+    <h3>A note on this prototype</h3>
+    <p>The letters in this edition are <strong>illustrative entries</strong> built for demonstration. The names, regiments, dates, and Iowa geographic context reflect real Civil War history, but the transcribed content is fabricated for this portfolio piece. A production version of this edition would be transcribed, edited, and reviewed against actual primary-source holdings by Special Collections staff, with faculty editorial oversight. <a href="/about-this-build.html">More on what would change in production &rarr;</a></p>
+  </div>
+
+  <h2>What's modeled here</h2>
+  <ul>
+    <li><strong>Descriptive metadata</strong> structured on the Dublin Core Terms (DCMI) vocabulary, with a small set of local properties for regiment, company, and addressee &mdash; the kind of extension a faculty PI typically asks for early in a project.</li>
+    <li><strong>IIIF-ready item detail pages</strong>, structured to consume IIIF Presentation API 3.0 manifests from a digitization workflow. The current prototype uses placeholder images and a public sample manifest.</li>
+    <li><strong>Full-text search and faceted filters</strong> across all items.</li>
+    <li><strong>WCAG 2.2 AA accessibility</strong> &mdash; semantic HTML, keyboard navigation, focus indicators, skip-to-content link, descriptive alt text, sufficient color contrast.</li>
+    <li><strong>A documented methodology page</strong> describing standards used, decisions made, and what would be Omeka S-backed in a production version.</li>
+  </ul>
+
+  <p style="margin-top: 2rem;"><a href="/items.html" class="btn-iowa">Browse the letters &rarr;</a></p>
+
+</main>
+
+<footer class="site-footer">
+  <div class="inner">
+    <div>
+      <h4>About this prototype</h4>
+      <p>Built as a portfolio piece for the Web Application Developer (Digital Scholarship &amp; Publishing Support) role at University of Iowa Libraries Information Technology, May 2026.</p>
+      <p><a href="/about-this-build.html">Read the build notes &rarr;</a></p>
+    </div>
+    <div>
+      <h4>Standards used</h4>
+      <p>Dublin Core Terms (DCMI) · IIIF Presentation API 3.0 · WCAG 2.2 AA · Semantic HTML5</p>
+    </div>
+  </div>
+</footer>
+
+<script src="/assets/js/site.js"></script>
+</body>
+</html>

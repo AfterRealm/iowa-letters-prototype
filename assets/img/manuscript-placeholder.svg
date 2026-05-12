@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 260" role="img" aria-label="Placeholder for digitized manuscript image">
+  <defs>
+    <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f8f0d8"/>
+      <stop offset="1" stop-color="#e8ddb8"/>
+    </linearGradient>
+    <filter id="age" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="3"/>
+      <feColorMatrix values="0 0 0 0 0.6  0 0 0 0 0.45  0 0 0 0 0.2  0 0 0 0.08 0"/>
+      <feComposite in2="SourceGraphic" operator="in"/>
+    </filter>
+  </defs>
+  <rect width="200" height="260" fill="url(#paper)" stroke="#a89968" stroke-width="1"/>
+  <rect width="200" height="260" fill="transparent" filter="url(#age)"/>
+  <!-- handwritten-style lines -->
+  <g stroke="#5d4818" stroke-width="0.6" stroke-linecap="round" fill="none" opacity="0.55">
+    <path d="M 18 38 Q 50 36 90 40 T 175 36"/>
+    <path d="M 18 56 Q 60 54 110 58 T 178 54"/>
+    <path d="M 18 74 Q 55 72 100 76 T 178 72"/>
+    <path d="M 18 92 Q 70 90 130 94 T 178 90"/>
+    <path d="M 18 110 Q 50 108 95 112 T 175 108"/>
+    <path d="M 18 128 Q 65 126 115 130 T 178 126"/>
+    <path d="M 18 146 Q 55 144 100 148 T 178 144"/>
+    <path d="M 18 164 Q 70 162 125 166 T 178 162"/>
+    <path d="M 18 182 Q 50 180 90 184 T 165 180"/>
+    <path d="M 18 200 Q 60 198 105 202 T 175 198"/>
+    <path d="M 18 218 Q 55 216 95 220 T 158 216"/>
+  </g>
+  <!-- corner fold -->
+  <path d="M 168 0 L 200 0 L 200 32 Z" fill="#d8c896" stroke="#a89968" stroke-width="0.5"/>
+  <!-- label band -->
+  <rect x="0" y="232" width="200" height="28" fill="#1a1410" opacity="0.85"/>
+  <text x="100" y="250" font-family="Inter, sans-serif" font-size="9" fill="#d4a542" text-anchor="middle" letter-spacing="1.5">MANUSCRIPT PLACEHOLDER</text>
+</svg>

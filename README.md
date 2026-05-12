@@ -6,7 +6,7 @@ Built by **Meredith Sealy** as a portfolio piece for the **Web Application Devel
 
 ## Live URLs
 
-- **The prototype site:** [deployed link goes here once on Netlify]
+- **The prototype site:** https://iowa-letters.netlify.app
 - **Live Omeka S 4.1.1 backend:** https://iowa.dev.01.ngrok.dev/s/iowa-letters
 - **Omeka backend Docker stack:** https://github.com/AfterRealm/iowa-omeka-lab
 

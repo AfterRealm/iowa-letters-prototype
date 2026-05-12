@@ -21,7 +21,7 @@
 <header class="site-banner">
   <div class="container">
     <div class="branding">
-      <div class="institution">University of Iowa Libraries · Digital Scholarship &amp; Publishing Studio</div>
+      <div class="institution">A prototype for: University of Iowa Libraries · Digital Scholarship &amp; Publishing Studio</div>
       <p class="edition-title">Iowa Letters</p>
       <p class="tagline">A Digital Edition of Civil War Correspondence from Iowa Volunteers</p>
     </div>
@@ -56,20 +56,21 @@
   <p>In this prototype, manifest URLs point to public IIIF samples. A production build would consume manifests from the digitization workflow used by Special Collections.</p>
 
   <h2>Accessibility</h2>
-  <p>This prototype is built against <strong>WCAG 2.2 Level AA</strong>. Specific decisions:</p>
+  <p>This prototype is built against <strong>WCAG 2.2 Level AA</strong> and audited end-to-end with <strong>axe-core</strong>. Every page passes with zero violations. Specific decisions:</p>
   <ul>
     <li>Semantic HTML5 throughout (<code>main</code>, <code>nav</code>, <code>article</code>, <code>section</code>, descriptive headings)</li>
-    <li>Skip-to-content link as the first focusable element on every page</li>
+    <li>Skip-to-content link as the first focusable element on every page; <code>tabindex="-1"</code> on the <code>&lt;main&gt;</code> target so keyboard focus actually moves on skip-link activation across all browser / AT combinations</li>
     <li>Visible focus indicators on all interactive elements (<code>:focus-visible</code> outline, two-pixel)</li>
-    <li>Color contrast verified against WCAG 2.2 AA thresholds (text on paper background &gt; 9:1; gold accents on dark only where decorative)</li>
-    <li>Alt text on all images; transcriptions present for every letter so the content is accessible without the image</li>
-    <li>Forms with explicit labels and ARIA attributes; <code>aria-live</code> regions for dynamic search results</li>
-    <li>Keyboard navigable end-to-end</li>
+    <li>Color contrast: a two-tier accent system (deep gold for cream backgrounds, brighter gold for dark backgrounds), each documented in CSS comments. Initial audit caught seven contrast failures in dark-themed header/footer; the fix was to introduce the second accent rather than wallpaper over the issue.</li>
+    <li>Alt text on all images; full transcriptions present for every letter so the content is accessible without the image</li>
+    <li>Forms with explicit labels and ARIA attributes; <code>aria-live</code> regions for dynamic search results and item-detail loads</li>
+    <li>Keyboard navigable end-to-end; verified heading hierarchy (no skipped levels)</li>
   </ul>
+  <p class="text-small muted">The audit was first run with <a href="https://github.com/AfterRealm">Curb Cut</a>, a small WCAG 2.2 AA auditing tool I authored that wraps axe-core. The same prototype is re-audited on every commit during local development.</p>
 
   <h2>Why this stack</h2>
   <p>This prototype is built in <strong>vanilla HTML, CSS, and JavaScript</strong> for portability and simplicity in the prototype phase. A production version of this edition would be built on <strong>Astro 5 with Bootstrap 5</strong> to match the pattern Libraries Information Technology is currently using on newer digital edition projects, and to take advantage of Astro's static-site generation for performance and long-term maintainability.</p>
-  <p>The data layer in this prototype is a single JSON file shaped to mirror the response of an <strong>Omeka S</strong> instance's JSON-LD API. This was intentional: it lets the front-end be developed in parallel with backend curatorial work, and lets the same front-end migrate cleanly to a real Omeka S backend once the curatorial workflow is in place.</p>
+  <p>The data layer in this prototype is a single JSON file shaped to mirror the response of an <strong>Omeka S</strong> instance's JSON-LD API. This was intentional: the front-end can be developed in parallel with the curatorial backend, and the same six items also exist in a real Omeka S install (described below) so that the migration from static JSON to live API is a one-line change in <code>site.js</code>.</p>
 
   <h2 id="omeka">The Omeka S backend behind this prototype</h2>
   <p>The data shape this front-end consumes isn't notional &mdash; there is a real <strong>Omeka S 4.1.1</strong> instance running locally, modeled with the same Resource Template, Item Set, and six items shown on this site. Setting it up surfaced a useful problem worth describing: every public Docker image for Omeka S was either stale (the official <code>omeka/omeka-s</code> image had not been updated since 2017) or shipped with broken default configuration. Rather than build the demo on top of a misleading or outdated foundation, I wrote a custom <code>Dockerfile</code> against PHP 8.3 FPM, packaged the upstream Omeka S 4.1.1 release zip, and stood up a three-service stack (MariaDB + PHP-FPM + nginx) controlled by Docker Compose. I then populated the install entirely through Omeka S's REST API, which is the same way a faculty publishing project would automate content ingest.</p>

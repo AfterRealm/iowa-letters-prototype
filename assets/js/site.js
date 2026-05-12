@@ -168,29 +168,55 @@ function initItemPage() {
   });
 }
 
+function ensureShotViewer() {
+  let dialog = document.getElementById('shotViewer');
+  if (dialog) return dialog;
+  dialog = document.createElement('dialog');
+  dialog.className = 'shot-viewer';
+  dialog.id = 'shotViewer';
+  dialog.setAttribute('aria-labelledby', 'shotViewerTitle');
+  dialog.innerHTML = `
+    <div class="shot-viewer-head">
+      <h2 id="shotViewerTitle" class="shot-viewer-title">Image detail</h2>
+      <button type="button" class="shot-viewer-close" aria-label="Close image viewer">Close &times;</button>
+    </div>
+    <div class="shot-viewer-body">
+      <img id="shotViewerImg" alt="" />
+      <p id="shotViewerCaption" class="shot-viewer-caption"></p>
+    </div>
+  `;
+  document.body.appendChild(dialog);
+  return dialog;
+}
+
 function initShotViewer() {
-  const dialog = document.getElementById('shotViewer');
-  if (!dialog) return;
-  const img = document.getElementById('shotViewerImg');
-  const captionEl = document.getElementById('shotViewerCaption');
+  const triggers = document.querySelectorAll('.screenshot-trigger');
+  if (!triggers.length) return;
+  const dialog = ensureShotViewer();
+  const img = dialog.querySelector('#shotViewerImg');
+  const captionEl = dialog.querySelector('#shotViewerCaption');
   const closeBtn = dialog.querySelector('.shot-viewer-close');
 
-  document.querySelectorAll('.screenshot-trigger').forEach(btn => {
+  triggers.forEach(btn => {
     btn.addEventListener('click', () => {
       const sourceImg = btn.querySelector('img');
       if (!sourceImg) return;
-      img.src = sourceImg.src;
-      img.alt = sourceImg.alt;
-      const fig = btn.closest('figure');
-      const cap = fig ? fig.querySelector('figcaption') : null;
-      captionEl.textContent = cap ? cap.textContent.replace(/\s+/g, ' ').trim() : '';
+      // Allow a higher-res variant via data-full-src
+      img.src = btn.dataset.fullSrc || sourceImg.src;
+      img.alt = sourceImg.alt || '';
+      const captionFromData = btn.dataset.caption;
+      if (captionFromData) {
+        captionEl.textContent = captionFromData;
+      } else {
+        const fig = btn.closest('figure');
+        const cap = fig ? fig.querySelector('figcaption') : null;
+        captionEl.textContent = cap ? cap.textContent.replace(/\s+/g, ' ').trim() : '';
+      }
       dialog.showModal();
     });
   });
 
   if (closeBtn) closeBtn.addEventListener('click', () => dialog.close());
-
-  // Click outside the image area closes
   dialog.addEventListener('click', (e) => {
     if (e.target === dialog) dialog.close();
   });

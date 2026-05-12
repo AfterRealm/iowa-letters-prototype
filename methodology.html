@@ -105,16 +105,20 @@
   <p>The point of running both alongside this prototype is to demonstrate the judgment call: Omeka's default theme is functional and library-coded, but for high-profile faculty editions a custom decoupled front-end (like this one) lets a project have its own visual identity while still benefiting from Omeka's curatorial workflow. Day-to-day in this role, either approach would be on the table; the right choice depends on the project's audience, lifespan, and budget.</p>
 
   <h2>What lives in production that does not live here</h2>
+  <p>The Omeka S backend is in place (linked above). What a faculty-grade production deployment would add on top of what's running here:</p>
   <ul>
-    <li>An <strong>Omeka S installation</strong> hosting items, item sets, and resource templates &mdash; with role-based curatorial access for the faculty PI and Special Collections editor</li>
-    <li>A <strong>digitization-to-IIIF pipeline</strong> feeding manifests to the front-end</li>
-    <li><strong>OAI-PMH endpoint</strong> exposing the edition's metadata for harvest by aggregators (DPLA, etc.)</li>
+    <li><strong>Role-based curatorial access</strong> in Omeka for the faculty PI and Special Collections editor &mdash; the current install has a single global admin</li>
+    <li>A <strong>digitization-to-IIIF pipeline</strong> producing real Presentation API 3.0 manifests from manuscript scans, replacing the placeholder thumbnails</li>
+    <li>An <strong>OAI-PMH endpoint</strong> exposing the edition's metadata for harvest by aggregators (DPLA, etc.) &mdash; available in Omeka as a module, not yet installed here</li>
     <li>A small <strong>citation export</strong> feature (BibTeX, RIS, Chicago note-bibliography)</li>
     <li>An <strong>editorial annotation layer</strong> using the W3C Web Annotation Data Model, allowing scholars to annotate passages in the transcriptions</li>
+    <li>Real <strong>transcriptions and curatorial review</strong> against actual primary-source holdings</li>
   </ul>
 
   <h2>Sustainability</h2>
-  <p>This prototype intentionally has <strong>no build step</strong> &mdash; it is plain static files that can be served from anywhere and survive any platform churn. The production version on Astro 5 would compile to static files too. The data model uses an open vocabulary (DCMI) so that if the front-end is ever rewritten, the underlying metadata travels intact to whatever comes next. Documentation lives alongside the code, in the same repository, version-controlled.</p>
+  <p>The prototype front-end here has <strong>no build step</strong> &mdash; plain HTML, CSS, and JavaScript that can be served from anywhere and survive any platform churn. The Omeka S backend does have a build step (a custom <code>Dockerfile</code> that compiles the image from the upstream Omeka release zip), but the build is fully reproducible from version-controlled source: anyone with Docker can clone the <a href="https://github.com/AfterRealm/iowa-omeka-lab">backend repo</a> and reproduce the same install in under five minutes.</p>
+
+  <p>A production rewrite on Astro 5 would introduce a small build step on the front-end side as well, but Astro compiles to static files &mdash; so the deployed output is still platform-agnostic. The data model uses an open vocabulary (DCMI) so that if the front-end is ever rewritten or migrated to a different CMS, the underlying metadata travels intact. Documentation lives alongside the code, in the same repository, version-controlled.</p>
 
 </main>
 

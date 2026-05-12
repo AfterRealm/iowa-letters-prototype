@@ -626,9 +626,12 @@ footer.site-footer p { margin: 4px 0; }
 .shot-viewer-body img {
   display: block;
   max-width: 100%;
+  max-height: calc(96vh - 150px); /* leave room for header band + caption + padding */
+  width: auto;
   height: auto;
   margin: 0 auto;
   border: 1px solid var(--rule);
+  object-fit: contain;
 }
 .shot-viewer-caption {
   margin: 12px auto 0 auto;

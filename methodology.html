@@ -27,8 +27,8 @@
 <header class="site-banner">
   <div class="container">
     <div class="branding">
-      <button type="button" class="seal-trigger screenshot-trigger" data-full-src="/assets/img/iowa-letters-seal.png" data-caption="Iowa Letters seal. The Iowa state flag flanked by a Civil War Union soldier silhouette and an ink quill, ringed by ‘IOWA LETTERS · CIVIL WAR 1861-1865.’ Designed for the prototype by Justin Hess." aria-label="Open larger view: Iowa Letters seal">
-        <img class="site-seal" src="/apple-touch-icon.png" alt="Iowa Letters seal — Iowa state flag flanked by a Civil War soldier silhouette, an ink quill, and a letter" width="180" height="180" />
+      <button type="button" class="seal-trigger screenshot-trigger" data-full-src="/assets/img/iowa-letters-seal.png" data-caption="Iowa Letters seal. AI-generated with Google Gemini (Nanobanana) from a prompt; background removed locally with Picasso Studio. Full prompt and provenance below." aria-label="Open larger view: Iowa Letters seal">
+        <img class="site-seal" src="/apple-touch-icon.png" alt="Iowa Letters seal. Image generated with Google Gemini (Nanobanana)." width="180" height="180" />
         <span class="screenshot-hover">View larger</span>
       </button>
       <div class="branding-text">
@@ -139,6 +139,21 @@
   </dialog>
 
   <p>The point of running both alongside this prototype is to demonstrate the judgment call: Omeka's default theme is functional and library-coded, but for high-profile faculty editions a custom decoupled front-end (like this one) lets a project have its own visual identity while still benefiting from Omeka's curatorial workflow. Day-to-day in this role, either approach would be on the table; the right choice depends on the project's audience, lifespan, and budget.</p>
+
+  <h2 id="provenance">Image attribution and provenance</h2>
+  <p>Scholarly publishing surfaces care about where source material comes from. This site has two image sources worth disclosing.</p>
+
+  <h3>The Iowa Letters seal</h3>
+  <p>The circular seal in the header is AI-generated. It was produced with <strong>Google Gemini</strong> (the "Nanobanana" model variant), then post-processed locally to remove the background.</p>
+  <ul>
+    <li><strong>Generator:</strong> Google Gemini (Nanobanana)</li>
+    <li><strong>Prompt:</strong> <em>"Create a favicon for the Iowa Letters website that showcases letters written to home from Iowa soldiers during the Civil War. Use Iowa + Civil War + old ink pen for the main themes."</em></li>
+    <li><strong>Post-processing:</strong> Background removed locally with Picasso Studio (a personal image-tools application that wraps the <code>rembg</code> Python library).</li>
+    <li><strong>Output sizes:</strong> Master at 2048×2048, then resampled with Pillow into the standard favicon set (16/32/48, ICO multi-resolution, 180 apple-touch, 192 and 512 android-chrome).</li>
+  </ul>
+
+  <h3>Manuscript thumbnails and Omeka screenshots</h3>
+  <p>Item thumbnails are a custom SVG placeholder I drew for this prototype (an aged-paper card with ink lines and a "MANUSCRIPT PLACEHOLDER" label). The screenshots embedded above were first-party captures of the live Omeka S 4.1.1 admin and public-facing site, taken via Playwright.</p>
 
   <h2>What lives in production that does not live here</h2>
   <p>The Omeka S backend is in place (linked above). What a faculty-grade production deployment would add on top of what's running here:</p>

@@ -222,8 +222,27 @@ function initShotViewer() {
   });
 }
 
+function initBackToTop() {
+  // Auto-inject the button on every page so individual pages don't need markup.
+  let btn = document.getElementById('backToTop');
+  if (!btn) {
+    btn = document.createElement('button');
+    btn.id = 'backToTop';
+    btn.className = 'back-to-top';
+    btn.type = 'button';
+    btn.setAttribute('aria-label', 'Back to top of page');
+    btn.innerHTML = '<span aria-hidden="true">&uarr;</span><span class="sr-only">Top</span>';
+    document.body.appendChild(btn);
+  }
+  const check = () => btn.classList.toggle('visible', window.scrollY > 400);
+  window.addEventListener('scroll', check, { passive: true });
+  check();
+  btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   initIndexPage();
   initItemPage();
   initShotViewer();
+  initBackToTop();
 });

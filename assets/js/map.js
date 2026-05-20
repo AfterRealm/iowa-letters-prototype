@@ -641,6 +641,8 @@
       zoom: INITIAL_VIEW.zoom,
       attributionControl: { compact: true },
     });
+    // Test hook (used by tests/verify-home-lines.mjs). Harmless in production.
+    window.__map_ref = state.map;
 
     state.map.addControl(new maplibregl.NavigationControl({ visualizePitch: false, showCompass: false }), 'top-right');
     state.map.addControl(new maplibregl.ScaleControl({ unit: 'imperial' }), 'bottom-left');

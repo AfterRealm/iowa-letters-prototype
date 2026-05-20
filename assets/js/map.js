@@ -686,18 +686,21 @@
       setTimeout(pollOmeka, 2000);
       state.pollTimer = setInterval(pollOmeka, POLL_INTERVAL_MS);
 
-      // If the URL has ?focus=ID, select that feature once the poll has
-      // brought it in (give it up to ~30s).
+      // If the URL has ?focus=ID, wait until the first Omeka poll has
+      // completed before resolving the id — the seed's items.json ids
+      // (1-6) don't match Omeka's auto-assigned 2-7+, so resolving
+      // against the seed lands on the wrong letter (e.g. ?focus=6 hits
+      // Goldsboro in the seed but should hit Savannah from Omeka).
       const focusId = new URLSearchParams(window.location.search).get('focus');
       if (focusId) {
         const wantId = Number(focusId);
         const start = performance.now();
         const tryFocus = () => {
-          if (state.features.some((f) => f.properties.id === wantId)) {
+          if (state.firstPollDone && state.features.some((f) => f.properties.id === wantId)) {
             selectFeature(wantId, { fly: true });
             return;
           }
-          if (performance.now() - start < 30000) setTimeout(tryFocus, 1500);
+          if (performance.now() - start < 30000) setTimeout(tryFocus, 800);
         };
         tryFocus();
       }

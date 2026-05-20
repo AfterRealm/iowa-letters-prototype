@@ -357,30 +357,23 @@
   }
 
   // ─── Timeline ─────────────────────────────────────────────────────────────
+  function computeDateExtent() {
+    const dates = state.features
+      .map((f) => f.properties.date)
+      .filter(Boolean)
+      .sort();
+    if (!dates.length) return null;
+    return { min: dates[0], max: dates[dates.length - 1] };
+  }
+
   function setupTimeline() {
     const slider = document.getElementById('timeline-slider');
     const readout = document.getElementById('timeline-readout');
     if (!slider || !readout) return;
 
-    // Compute domain from the data.
-    const dates = state.features
-      .map((f) => f.properties.date)
-      .filter(Boolean)
-      .sort();
-    if (!dates.length) return;
-    state.minDate = dates[0];
-    state.maxDate = dates[dates.length - 1];
-    state.currentDate = state.maxDate;
-
-    // Slider domain in days from minDate
-    const minTs = new Date(state.minDate).getTime();
-    const maxTs = new Date(state.maxDate).getTime();
-    const days = Math.max(1, Math.round((maxTs - minTs) / 86400000));
-    slider.min = '0';
-    slider.max = String(days);
-    slider.value = String(days);
-
     function updateFromSlider() {
+      if (!state.minDate || !state.maxDate) return;
+      const minTs = new Date(state.minDate).getTime();
       const v = Number(slider.value);
       const ts = minTs + v * 86400000;
       const iso = new Date(ts).toISOString().slice(0, 10);
@@ -389,7 +382,35 @@
       applyMapData();
     }
     slider.addEventListener('input', updateFromSlider);
-    updateFromSlider();
+    state._updateTimelineFromSlider = updateFromSlider;
+
+    refreshTimelineDomain();
+  }
+
+  // Re-evaluate the timeline domain after a poll. New letters can extend the
+  // date range past the seed's last entry; without this, anything dated
+  // after the seed's last letter falls outside the slider's reach and is
+  // permanently filtered out.
+  function refreshTimelineDomain() {
+    const slider = document.getElementById('timeline-slider');
+    const readout = document.getElementById('timeline-readout');
+    if (!slider || !readout) return;
+
+    const extent = computeDateExtent();
+    if (!extent) return;
+
+    const wasAtMax = !state.maxDate || slider.value === slider.max;
+    state.minDate = extent.min;
+    state.maxDate = extent.max;
+
+    const minTs = new Date(state.minDate).getTime();
+    const maxTs = new Date(state.maxDate).getTime();
+    const days = Math.max(1, Math.round((maxTs - minTs) / 86400000));
+    slider.min = '0';
+    slider.max = String(days);
+    if (wasAtMax) slider.value = String(days);
+
+    if (state._updateTimelineFromSlider) state._updateTimelineFromSlider();
   }
 
   // ─── Toggles ──────────────────────────────────────────────────────────────
@@ -544,6 +565,7 @@
     state.features = fresh;
     for (const id of incomingIds) state.knownIds.add(id);
 
+    refreshTimelineDomain();
     applyMapData();
     renderSidebar();
 

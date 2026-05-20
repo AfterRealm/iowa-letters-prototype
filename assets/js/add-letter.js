@@ -1,26 +1,27 @@
 // Iowa Letters — public authoring UI.
 //
-// Loads behind a passphrase gate (IowaLetters). Once unlocked, presents a
-// Dublin Core-aligned form with gazetteer-backed place autocomplete and
-// POSTs the new letter to Omeka S via REST as the iowa-letters-author user.
+// Loads behind a passphrase gate. Once unlocked, presents a Dublin Core form
+// with gazetteer-backed place autocomplete. Submissions POST to a server-
+// side Netlify Function (/.netlify/functions/post-letter) which validates
+// the passphrase against an env var and forwards the payload to Omeka with
+// credentials the browser never sees.
 //
-// Security posture (intentionally a soft gate; production = institutional SSO):
-//   - The passphrase is checked client-side. Anyone with the page source can
-//     trivially bypass it. That's fine — the IowaLetters string exists to
-//     keep casual visitors out, not to be a real auth boundary.
-//   - The Omeka API key embedded here belongs to a role-bounded Author user.
-//     The worst that can happen if the key leaks is unwanted new-item POSTs
-//     (no DELETE, no admin reach, no global settings). The key rotates by
-//     re-running omeka-lab/setup-author-user.mjs.
+// Security posture (v0.3.0 — credentials live server-side):
+//   - Browser knows nothing about the Omeka REST API key. The Function holds
+//     it via Netlify env vars; the deployed JS contains zero secrets.
+//   - The passphrase gate is enforced on BOTH sides: client-side to UX-gate
+//     the form, server-side as the actual auth boundary in the Function.
+//   - In production this would sit behind institutional SSO, with the
+//     Function replaced by an authenticated route.
 (function () {
   'use strict';
 
-  const PASSPHRASE = 'IowaLetters';
+  const FN_URL = '/.netlify/functions/post-letter';
   const GAZ_URL = '/data/gazetteer.json';
 
   const KEY = window.OMEKA_AUTHOR_KEY || {};
-  if (!KEY.KEY_ID || !KEY.KEY_CRED) {
-    showFatal('The Omeka author credentials file did not load. The authoring form is offline.');
+  if (!KEY.PROPS || !KEY.RESOURCE_TEMPLATE_ID) {
+    showFatal('The authoring configuration file (author-key.js) did not load. The form is offline.');
     return;
   }
 
@@ -53,6 +54,12 @@
   }
 
   // ─── Gate ─────────────────────────────────────────────────────────────────
+  // The client-side gate is purely UX. The real auth check happens on the
+  // server inside the Function (the passphrase travels in every submission
+  // and is validated against an env var there). If a savvy visitor bypasses
+  // the client gate they still cannot POST without the correct passphrase.
+  let unlockedPassphrase = null;
+
   function setupGate() {
     const gate = $('gate-screen');
     const form = $('author-form');
@@ -62,17 +69,19 @@
 
     function tryUnlock() {
       const v = input.value.trim();
-      if (v === PASSPHRASE) {
-        gate.hidden = true;
-        form.hidden = false;
-        // Move focus into the form for keyboard users
-        const firstField = form.querySelector('input, textarea, select');
-        if (firstField) firstField.focus();
-      } else {
-        err.textContent = 'That passphrase does not match. Check the cover letter for the right one.';
+      if (!v) {
+        err.textContent = 'Enter the passphrase from the cover letter.';
         err.hidden = false;
         input.focus();
+        return;
       }
+      // No client-side string-compare: just stash it and let the server
+      // accept or reject on submission. Keeps the gate honest.
+      unlockedPassphrase = v;
+      gate.hidden = true;
+      form.hidden = false;
+      const firstField = form.querySelector('input, textarea, select');
+      if (firstField) firstField.focus();
     }
 
     btn.addEventListener('click', tryUnlock);
@@ -189,17 +198,27 @@
 
     setStatus('Submitting to Omeka…');
     const payload = buildPayload(form);
+    payload.passphrase = unlockedPassphrase;
 
     try {
-      const url = `${KEY.API_BASE}/items?key_identity=${encodeURIComponent(KEY.KEY_ID)}&key_credential=${encodeURIComponent(KEY.KEY_CRED)}`;
-      const r = await fetch(url, {
+      const r = await fetch(FN_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
       const body = await r.json().catch(() => ({}));
+      if (r.status === 401) {
+        setStatus('That passphrase did not match. Check the cover letter for the right one.', 'error');
+        // Re-show the gate so the user can re-enter
+        $('gate-screen').hidden = false;
+        $('author-form').hidden = true;
+        unlockedPassphrase = null;
+        return;
+      }
       if (!r.ok) {
-        const msg = body && body.errors ? JSON.stringify(body.errors) : `HTTP ${r.status}`;
+        const msg = body && (body.error || body.errors)
+          ? (body.error || JSON.stringify(body.errors))
+          : `HTTP ${r.status}`;
         setStatus(`Omeka rejected the letter: ${msg}`, 'error');
         return;
       }

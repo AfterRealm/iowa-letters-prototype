@@ -1,17 +1,20 @@
 // Iowa Letters — Map view
 //
-// MapLibre GL JS reads letters.geojson and renders each letter as a Point
-// styled by soldier (Hartwell = orange circle, Burroughs = blue square via
-// the "letter-icons" sprite). Home counties render as a separate diamond
-// layer. Connecting lines from each letter to its home county are an
-// optional toggleable layer.
+// MapLibre GL JS over OpenStreetMap. Loads the static letters.geojson seed
+// for instant render, then short-polls Omeka REST every 12 seconds and
+// reconciles. Each letter renders as a Point styled by soldier:
+//   - Jonathan Hartwell:  solid orange circle (#b85c38)
+//   - Elias Burroughs:    blue circle with paper-color center dot (bullseye)
+//   - Community-authored: bright gold circle with heavy ink halo
+// Home counties render as a separate green-circle layer. Lines from each
+// letter to its home county are an optional toggleable layer.
 //
-// Timeline scrubber filters by date. Sidebar list and map markers are
-// bidirectional: clicking either side opens the popup and pans.
+// Timeline scrubber filters by date and auto-expands when poll-arriving
+// letters extend the date range. Sidebar list and map markers stay in sync
+// in both directions: clicking either opens the popup and pans.
 //
-// In a later phase the page can switch from the static GeoJSON to a poll
-// loop reading Omeka's REST API. That hook is the loadFeatures() function;
-// swap its body for a fetch + transform.
+// Polling pauses when the document is hidden (Page Visibility API) to avoid
+// burning ngrok bandwidth on background tabs.
 (function () {
   'use strict';
 
@@ -501,19 +504,6 @@
     return null;
   }
 
-  function parseHomeFromAddressee(addr) {
-    if (!addr) return null;
-    const parts = addr.split(',').map((s) => s.trim());
-    for (let i = 0; i < parts.length; i++) {
-      if (/county/i.test(parts[i])) {
-        const candidate = [parts[i], ...parts.slice(i + 1)].join(', ');
-        const hit = lookupPlace(candidate);
-        if (hit) return hit;
-      }
-    }
-    return null;
-  }
-
   // Transform an Omeka item record into a Feature matching letters.geojson
   // shape. Home anchors are looked up by creator (soldier name) — far more
   // stable than by id, because Omeka's auto-assigned ids don't line up with
@@ -768,6 +758,20 @@
       // focus (and live-update detection) doesn't wait on a timer.
       pollOmeka();
       state.pollTimer = setInterval(pollOmeka, POLL_INTERVAL_MS);
+
+      // Pause polling while the tab is hidden so we don't waste ngrok
+      // bandwidth on background tabs. Resume immediately on return.
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          if (state.pollTimer) {
+            clearInterval(state.pollTimer);
+            state.pollTimer = null;
+          }
+        } else if (!state.pollTimer) {
+          pollOmeka();
+          state.pollTimer = setInterval(pollOmeka, POLL_INTERVAL_MS);
+        }
+      });
 
       // If the URL has ?focus=ID, wait until the first Omeka poll has
       // completed before resolving the id — the seed's items.json ids

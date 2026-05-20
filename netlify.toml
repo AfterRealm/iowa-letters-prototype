@@ -19,6 +19,10 @@
   command = "node scripts/build-version.js && node scripts/build-author-key.js"
   publish = "."
 
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
 [[redirects]]
   from = "/map-methodology.html"
   to = "/methodology.html#map"

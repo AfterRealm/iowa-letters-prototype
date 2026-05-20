@@ -64,20 +64,27 @@
 
   <pre style="background: var(--paper-soft); border: 1px solid var(--rule); border-radius: 3px; padding: 0.9rem 1rem; overflow-x: auto; font-family: 'Cascadia Code', Consolas, monospace; font-size: 0.85rem; line-height: 1.6;">┌──────────────────────────────────────────────────────────────────┐
 │  Visitor opens /add-letter.html                                  │
-│      ↓ enters IowaLetters passphrase                             │
-│      ↓ form unlocks                                              │
+│      ↓ enters passphrase                                          │
+│      ↓ form unlocks (UX only; no client-side validation)         │
 │  Visitor fills in Dublin Core fields, picks a place from the     │
 │  gazetteer autocomplete, submits                                 │
 │      ↓                                                            │
-│  add-letter.js builds an Omeka REST payload (literal property    │
-│  blocks against the existing 'Civil War Letter' Resource         │
-│  Template) and POSTs to:                                          │
+│  add-letter.js builds an Omeka REST payload, attaches the        │
+│  passphrase, and POSTs to:                                        │
+│      POST /.netlify/functions/post-letter                         │
+│      ↓                                                            │
+│  Function validates passphrase against env var.                  │
+│  If invalid → 401, browser re-shows the gate.                    │
+│  If valid → forward to Omeka with server-side credentials:        │
 │      POST /api/items?key_identity=…&key_credential=…             │
+│      (KEY_ID + KEY_CRED read from Netlify env vars;               │
+│       never leave the server)                                     │
 │      ↓                                                            │
 │  Omeka S 4.1.1 writes the record to MariaDB                       │
 │  and returns the new item id                                      │
 │      ↓                                                            │
-│  add-letter.js shows the success block with a link to the map   │
+│  Function relays the response; add-letter.js surfaces the         │
+│  success block with a /map.html?focus=<id> link.                 │
 │                                                                   │
 │  ┄┄┄┄┄┄ meanwhile, in another tab ┄┄┄┄┄┄                          │
 │                                                                   │
@@ -89,19 +96,20 @@
 └──────────────────────────────────────────────────────────────────┘</pre>
 
   <h2>The role-bounded user model</h2>
-  <p>The public form embeds an Omeka REST API key. That key belongs to a separate user, <code>iowa-letters-author</code>, created with Omeka S's <strong>Author role</strong>. The Author role is the smallest role in Omeka that can create new items; it cannot edit other users' records, cannot delete anything, cannot reach the global admin dashboard, cannot modify resource templates, vocabularies, or sites. The worst-case blast radius if the API key leaks is unwanted new-item POSTs — and those can be deleted from the admin and the key rotated by re-running a single script (<code>omeka-lab/setup-author-user.mjs</code>).</p>
+  <p>The Function POSTs to Omeka as a separate user, <code>iowa-letters-author</code>, created with Omeka S's <strong>Author role</strong>. The Author role is the smallest role in Omeka that can create new items; it cannot edit other users' records, cannot delete anything, cannot reach the global admin dashboard, cannot modify resource templates, vocabularies, or sites. Even in the unlikely event of a server-side credential leak, the worst-case blast radius is unwanted new-item POSTs &mdash; and those can be deleted from the admin and the key rotated by re-running <code>omeka-lab/setup-author-user.mjs</code>.</p>
 
-  <p>This is the right shape for a digital scholarship prototype that puts an authoring form in front of strangers. The admin's REST key is never near the browser-shipped code. The role-bounded key is what the form holds.</p>
+  <p>This is the right shape for a digital scholarship prototype that puts an authoring form in front of strangers. The admin's REST key never leaves a developer workstation. The role-bounded key lives only as Netlify environment variables on the server.</p>
 
   <h2>The passphrase gate</h2>
-  <p>The form is gated behind a client-side passphrase check (<code>IowaLetters</code>). This is an intentional soft gate, not a real authentication boundary:</p>
+  <p>The form is gated behind a passphrase that is enforced on both sides of the network boundary. The browser-side check is purely a UX nicety; the real auth boundary lives in the Function:</p>
   <ul>
-    <li>The passphrase is in the source of the page. Anyone with developer tools can bypass it in seconds. It exists to keep casual visitors out, not to be a real auth layer.</li>
-    <li>The Omeka API key sits in <code>assets/js/author-key.js</code> on the deployed site. It is also visible in page source. The role-bounded user is what does the real security work.</li>
-    <li>In a production deployment at University of Iowa Libraries, both layers would be replaced with <strong>institutional Single Sign-On</strong>. The form would render only for authenticated users with the appropriate role (Studio staff, faculty PIs, project collaborators), and the API key would be a server-side session credential rather than a browser-shipped string.</li>
+    <li><strong>Browser-side:</strong> the user enters a passphrase to reveal the form. Nothing about that string is validated locally &mdash; it is simply stashed and sent with every submission. A savvy visitor who bypasses the client gate still cannot POST without the correct passphrase.</li>
+    <li><strong>Server-side:</strong> every submission goes to <code>/.netlify/functions/post-letter</code>, which compares the supplied passphrase against the <code>IOWA_LETTERS_PASSPHRASE</code> environment variable. If the comparison fails, the function returns <code>401</code>, the browser re-shows the gate screen, and Omeka is never touched.</li>
+    <li><strong>Credentials:</strong> <code>OMEKA_AUTHOR_KEY_ID</code> and <code>OMEKA_AUTHOR_KEY_CRED</code> live only as Netlify environment variables, read by the function and forwarded to Omeka on the server side. The browser-shipped JavaScript bundle contains zero secrets.</li>
+    <li><strong>In a production deployment</strong> at University of Iowa Libraries, this two-layer gate would be replaced with institutional Single Sign-On. The form would render only for authenticated users with the appropriate role (Studio staff, faculty PIs, project collaborators), and the Function would be replaced with an authenticated route under the libraries.uiowa.edu hostname.</li>
   </ul>
 
-  <p>The honest framing of the prototype's security model is: the demo trusts that the hiring committee won't deliberately spam the form, and the bounded user role caps the damage if anyone does. That's enough to demonstrate the workflow; it is not enough to put in production as-is.</p>
+  <p>The honest framing of the prototype's security model: a shared passphrase is enforced server-side, the Omeka credential never leaves Netlify's environment-variable store, and the Author role caps blast radius to creating new items even if both layers were somehow defeated.</p>
 
   <h2>CORS and the cross-origin path</h2>
   <p>The static front-end is served from Netlify; the Omeka backend is exposed through ngrok. Those are different origins, which means the browser refuses cross-origin POST requests unless the server explicitly returns CORS headers. The Omeka container's nginx config (in the <a href="https://github.com/AfterRealm/iowa-omeka-lab" rel="external">iowa-omeka-lab</a> repo) was updated to:</p>
@@ -156,11 +164,15 @@
   <h2>Repo layout for the authoring side</h2>
   <pre style="background: var(--paper-soft); border: 1px solid var(--rule); border-radius: 3px; padding: 0.9rem 1rem; overflow-x: auto; font-family: 'Cascadia Code', Consolas, monospace; font-size: 0.85rem; line-height: 1.6;">iowa-demo/
   add-letter.html              ← gated form + success block
+  netlify/
+    functions/
+      post-letter.js           ← server-side proxy: passphrase check +
+                                 Omeka credentials, all from env vars
   assets/
     js/
-      add-letter.js            ← gate, validate, build payload, POST, status
-      author-key.example.js    ← in repo (placeholder values)
-      author-key.js            ← gitignored, real KEY_ID + KEY_CRED
+      add-letter.js            ← gate, validate, build payload, POST
+      author-key.js            ← public config only (API_BASE, PROPS, etc.)
+                                 NO credentials, generated at deploy time
   data/
     gazetteer.json             ← shared with the map's autocomplete
 
@@ -169,7 +181,7 @@ iowa-omeka-lab/
   setup-author-user.mjs        ← creates iowa-letters-author + generates key
   author-credentials.env       ← gitignored, output of setup-author-user.mjs</pre>
 
-  <p>The <code>author-key.js</code> file is gitignored. For the Netlify production deploy it's generated at build time from environment variables (<code>OMEKA_AUTHOR_KEY_ID</code> and <code>OMEKA_AUTHOR_KEY_CRED</code>) by a small build script — so the key lives in Netlify's encrypted env-var store, not in the repo.</p>
+  <p>The <code>author-key.js</code> file is regenerated on every Netlify deploy by <code>scripts/build-author-key.js</code> and holds only the public configuration (API base URL, Resource Template id, Dublin Core property ids). The actual secrets live in three Netlify environment variables: <code>IOWA_LETTERS_PASSPHRASE</code>, <code>OMEKA_AUTHOR_KEY_ID</code>, and <code>OMEKA_AUTHOR_KEY_CRED</code>. The Function is the only code that reads them; the browser never sees them.</p>
 
 </main>
 

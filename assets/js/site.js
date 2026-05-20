@@ -76,13 +76,36 @@ function initIndexPage() {
       : '<p class="muted">No items match those filters. Try clearing them.</p>';
   }
 
-  loadItems().then(loaded => {
-    items = loaded;
-    render();
+  // Try Omeka first (source of truth post-authoring), fall back to the
+  // static items.json seed if Omeka is unreachable. Mirrors the pattern
+  // used by initItemPage so the items list reflects every letter currently
+  // in the system, including community-authored ones.
+  (async function loadList() {
+    try {
+      const r = await fetch(`${OMEKA_API_BASE}/items?per_page=100`, {
+        cache: 'no-cache',
+        headers: { 'ngrok-skip-browser-warning': 'true' },
+      });
+      if (!r.ok) throw new Error(`Omeka returned HTTP ${r.status}`);
+      const omekaItems = await r.json();
+      items = omekaItems.map(omekaItemToDisplay);
+      render();
+    } catch (omekaErr) {
+      try {
+        items = await loadItems();
+        render();
+        listEl.insertAdjacentHTML('afterbegin',
+          `<p class="muted" style="margin-bottom: 1rem;">Showing the cached seed ` +
+          `because the live Omeka backend was unreachable ` +
+          `(<code>${escapeHtml(omekaErr.message)}</code>). Newly authored ` +
+          `letters may be missing from this list.</p>`);
+      } catch (seedErr) {
+        listEl.innerHTML = `<p class="muted">Could not load items: ${escapeHtml(seedErr.message)}</p>`;
+        return;
+      }
+    }
     [qEl, yearEl, regimentEl].forEach(el => el && el.addEventListener('input', render));
-  }).catch(err => {
-    listEl.innerHTML = `<p class="muted">Could not load items: ${escapeHtml(err.message)}</p>`;
-  });
+  })();
 }
 
 function renderItemDetail(item) {

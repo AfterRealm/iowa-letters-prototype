@@ -55,7 +55,45 @@
 <main id="main" tabindex="-1">
 
   <h1>About this build</h1>
-  <p class="lede">A short note from the applicant. This prototype site, both the content and the build, is my cover letter for the Web Application Developer (Digital Scholarship &amp; Publishing Support) position at Libraries Information Technology.</p>
+  <p class="lede">A short note from the applicant. This site is the working artifact behind two applications to the University of Iowa Libraries Information Technology team in May 2026: the original <strong>Web Application Developer (Digital Scholarship &amp; Publishing Support)</strong> position, and a follow-on application to the <strong>GIS Developer/Specialist</strong> position. The same prototype answers both, with a layer added on top for the geospatial role. Both stories are below.</p>
+
+  <h2>For the GIS Developer/Specialist application (added May 20, 2026)</h2>
+
+  <p>The GIS Developer/Specialist posting names the same partnership shape this site was already built around &mdash; a developer in LIT working with the Research Manager in the Digital Scholarship and Publishing Studio, supporting faculty-led projects through to completion. The GIS-specific responsibilities sit right on top of the digital edition substrate: web mapping in MapLibre / Leaflet / Mapbox GL JS, GeoJSON / Shapefile / CSV data interchange, raster and vector tilesets from scanned maps, instruction and consultation, BTAA-GIN liaison work. Rather than start a separate prototype, I extended this one.</p>
+
+  <div class="decision-log">
+    <div class="decision">
+      <div class="label">GIS extension &middot; What was added</div>
+      <h3>The geospatial layer, end to end</h3>
+      <ul>
+        <li><strong>An interactive map view</strong> (<a href="/map.html">/map.html</a>) of every letter's place of writing, built in <strong>MapLibre GL JS</strong> over OpenStreetMap. Sidebar list and map markers stay synchronised in both directions; a timeline scrubber filters by date across 1862-1865; an optional layer draws lines from each letter to the soldier's home county in Iowa.</li>
+        <li><strong>A public authoring form</strong> (<a href="/add-letter.html">/add-letter.html</a>) that writes a new letter directly to the Omeka S backend via REST, behind a passphrase gate. A 12-second short-poll loop on the map view picks it up with a flash animation. End-to-end loop: form &rarr; Omeka &rarr; map, in a few seconds. The role-bounded "Author" user means the embedded API key cannot do more than create new items.</li>
+        <li><strong>A geoprocessing pipeline</strong> (<a href="https://github.com/AfterRealm/iowa-letters-prototype/blob/gis-map/scripts/build-spatial.py" rel="external">scripts/build-spatial.py</a>) that reads the source records and a curated gazetteer authority file, and produces GeoJSON (RFC 7946), CSV with WKT geometry, and an ESRI Shapefile (with the <code>.prj</code> sidecar declaring WGS 84) from one pass. ArcPy and PyQGIS are documented as drop-in production replacements.</li>
+        <li><strong>A controlled-vocabulary gazetteer</strong> (<a href="/data/gazetteer.json">data/gazetteer.json</a>) with 39 places across seven Civil War theaters. The descriptive metadata in Omeka stores the canonical place name; the gazetteer maps it to a coordinate. That separation keeps the curatorial record clean and lets the gazetteer be swapped for GeoNames or LCSH without touching a single record.</li>
+        <li><strong>Two methodology pages</strong> documenting the geospatial work: <a href="/map-methodology.html">Map Methodology</a> and <a href="/authoring-pipeline.html">Authoring Pipeline</a>. These mirror the methodology page voice of the original build &mdash; standards used, decisions made, honest unknowns, production replacements.</li>
+        <li><strong>WCAG 2.2 AA</strong> verified end-to-end across all eight pages (axe-core, strict WCAG ruleset). Map accessibility is the hard case here, and is discussed at length on the Map Methodology page: the sidebar list is the keyboard-accessible primary surface; soldier encoding uses both colour and shape so the distinction survives colour-blind viewing; the map status is an <code>aria-live</code> region.</li>
+      </ul>
+    </div>
+
+    <div class="decision">
+      <div class="label">GIS extension &middot; Honest unknowns</div>
+      <h3>Where I would lean on mentorship from the Application Development lead and the BTAA-GIN community</h3>
+      <dl>
+        <dt>ArcGIS Pro and ArcPy at depth</dt>
+        <dd>I am comfortable with QGIS and with the open-source web stack. ArcGIS Pro and ArcPy are named in the posting; I have read the API surface and know the shape of common geoprocessing workflows, but I have not personally built and shipped a production ArcPy automation. I would expect to be paired with an experienced ArcGIS user before owning a production ArcGIS workflow.</dd>
+        <dt>Historical georeferencing at production fidelity</dt>
+        <dd>The Library of Congress raster overlay pipeline is documented on the methodology page but not yet shipped in this prototype. I am comfortable with the rasterio / GDAL tooling, ground-control-point selection, and gdal2tiles for output, but historical map georeferencing involves judgment calls about projection assumptions, paper distortion, and contemporary cartographic conventions that I would want to learn from a librarian or specialist who has done it at scale.</dd>
+        <dt>Big Ten Academic Alliance Geospatial Information Network (BTAA-GIN)</dt>
+        <dd>I know the BTAA-GIN exists, what it does, and where its discovery interfaces live. I have not been a contributing member of a Big Ten geospatial publishing workflow. I would expect to attend the calls, read the standards, and ramp on the contribution norms before depositing on Iowa's behalf.</dd>
+      </dl>
+    </div>
+  </div>
+
+  <p style="margin-top: 1.5rem;">The rest of this page is the original "About this build" content from the May 12 application to the Web Application Developer role &mdash; preserved unchanged because everything in it is still true of how I approach this work.</p>
+
+  <hr style="margin: 2.4rem 0; border: 0; border-top: 1px solid var(--rule);">
+
+  <h2>For the original Web Application Developer application (May 12, 2026)</h2>
 
   <h2>Why I built this instead of a cover letter</h2>
   <p>A cover letter PDF can describe a way of working. A working prototype <em>shows</em> one. I wanted you to be able to read the posting's specific responsibilities ("implementing and supporting CMS&hellip; commonly used in library and digital publishing contexts, such as Omeka," "modernizing existing applications," "contributing to system analysis and technical design activities based on requirements defined by the Research Manager," "applying established development standards") and then open this site and see those exact responsibilities embodied in a small but real artifact.</p>
@@ -169,7 +207,8 @@
   <ul>
     <li><strong>Portfolio:</strong> <a href="https://meredithsealyportfolio.netlify.app">meredithsealyportfolio.netlify.app</a></li>
     <li><strong>GitHub:</strong> <a href="https://github.com/AfterRealm">github.com/AfterRealm</a></li>
-    <li><strong>This prototype's source code:</strong> <a href="https://github.com/AfterRealm/iowa-letters-prototype">github.com/AfterRealm/iowa-letters-prototype</a></li>
+    <li><strong>This prototype's source code:</strong> <a href="https://github.com/AfterRealm/iowa-letters-prototype">github.com/AfterRealm/iowa-letters-prototype</a> &mdash; the GIS extension lives on the <a href="https://github.com/AfterRealm/iowa-letters-prototype/tree/gis-map">gis-map branch</a>.</li>
+    <li><strong>Map view:</strong> <a href="/map.html">/map.html</a> &middot; <strong>Authoring form:</strong> <a href="/add-letter.html">/add-letter.html</a> &middot; <strong>Map methodology:</strong> <a href="/map-methodology.html">/map-methodology.html</a> &middot; <strong>Authoring pipeline:</strong> <a href="/authoring-pipeline.html">/authoring-pipeline.html</a></li>
     <li><strong>The Omeka S backend's Dockerfile + populate script:</strong> <a href="https://github.com/AfterRealm/iowa-omeka-lab">github.com/AfterRealm/iowa-omeka-lab</a></li>
     <li><strong>Live Omeka S 4.1.1 backend:</strong> <a href="https://iowa.dev.01.ngrok.dev/s/iowa-letters">iowa.dev.01.ngrok.dev/s/iowa-letters</a></li>
     <li>Resume PDF (uploaded with this application)</li>
@@ -177,7 +216,7 @@
     <li>Phone: (440) 984-1813</li>
   </ul>
 
-  <p style="margin-top: 2rem;">Thank you for opening this and reading it. I would welcome the chance to talk through how I might contribute to LIT's work.</p>
+  <p style="margin-top: 2rem;">Thank you for opening this and reading it. Whether you are reading on behalf of the Web Application Developer search, the GIS Developer/Specialist search, or both, I would welcome the chance to talk through how I might contribute to LIT's work.</p>
 
   <p>Meredith Sealy</p>
 
@@ -197,7 +236,7 @@
   <div class="inner">
     <div>
       <h4>About this prototype</h4>
-      <p>Built by Meredith Sealy as a portfolio piece for the Web Application Developer (Digital Scholarship &amp; Publishing Support) role at University of Iowa Libraries Information Technology, May 2026.</p>
+      <p>Built by Meredith Sealy as a portfolio piece for two University of Iowa Libraries IT applications in May 2026: the original Web Application Developer (Digital Scholarship &amp; Publishing Support) role, and a follow-on application to the GIS Developer/Specialist role with the geospatial layer added on top.</p>
     </div>
     <div>
       <h4>Contact</h4>

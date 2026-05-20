@@ -20,6 +20,12 @@
   publish = "."
 
 [[redirects]]
+  from = "/map-methodology.html"
+  to = "/methodology.html#map"
+  status = 301
+  force = true
+
+[[redirects]]
   from = "/data/*"
   to = "/data/:splat"
   status = 200

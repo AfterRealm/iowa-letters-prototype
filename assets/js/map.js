@@ -66,6 +66,7 @@
     showHomeCounties: true,
     gazetteer: null,       // { byName: Map<string, place> }
     knownIds: new Set(),   // letter ids already on the map
+    homeIndex: new Map(),  // id -> { home_canonical, home_id, home_lat, home_lon }
     pollTimer: null,
     pollFails: 0,
   };
@@ -439,6 +440,11 @@
   }
 
   // Transform an Omeka item record into a Feature matching letters.geojson shape.
+  // The home-anchor data for the seed letters (ids 2-7) lives in the static
+  // GeoJSON and is keyed by id in state.homeIndex; Omeka does not currently
+  // store an addressee field, so we look the home up from the index rather
+  // than parsing it back out of Omeka. (Future enhancement: add an Omeka
+  // property for addressee and read it here.)
   function omekaItemToFeature(item) {
     const v = (key) => {
       const arr = item[key];
@@ -446,9 +452,16 @@
     };
     const place = lookupPlace(v('dcterms:spatial'));
     if (!place) return null;
-    const addressee = item.addressee || v('dcterms:contributor') || null;
-    const home = parseHomeFromAddressee(addressee);
     const id = item['o:id'];
+    const homeFromIndex = state.homeIndex.get(id);
+    // Fallback: parse the addressee out of dcterms:description for new
+    // letters authored via the public form, since add-letter posts addressee
+    // text into the description bundle. Best-effort.
+    let home = homeFromIndex || null;
+    if (!home) {
+      const addr = item.addressee || null;
+      home = parseHomeFromAddressee(addr);
+    }
     return {
       type: 'Feature',
       id,
@@ -460,14 +473,14 @@
         date: v('dcterms:date'),
         regiment: item.regiment || null,
         company: item.company || null,
-        addressee,
+        addressee: item.addressee || null,
         place_canonical: place.canonical,
         place_id: place.id,
         theater: place.theater,
-        home_canonical: home ? home.canonical : null,
-        home_id: home ? home.id : null,
-        home_lat: home ? home.lat : null,
-        home_lon: home ? home.lon : null,
+        home_canonical: home ? (home.canonical || home.home_canonical) : null,
+        home_id: home ? (home.id || home.home_id) : null,
+        home_lat: home ? (home.lat != null ? home.lat : home.home_lat) : null,
+        home_lon: home ? (home.lon != null ? home.lon : home.home_lon) : null,
         transcription: v('dcterms:description'),
       },
     };
@@ -597,7 +610,21 @@
       const [features, gaz] = await Promise.all([loadFeatures(), loadGazetteer()]);
       state.features = features;
       state.gazetteer = gaz;
-      for (const f of features) state.knownIds.add(f.properties.id);
+      // Build the id -> home-anchor index from the seed so later polls that
+      // return Omeka items (which don't carry addressee/home data) can still
+      // resolve the home county for each known letter.
+      for (const f of features) {
+        state.knownIds.add(f.properties.id);
+        const p = f.properties;
+        if (p.home_lat != null && p.home_lon != null) {
+          state.homeIndex.set(p.id, {
+            home_canonical: p.home_canonical,
+            home_id: p.home_id,
+            home_lat: p.home_lat,
+            home_lon: p.home_lon,
+          });
+        }
+      }
     } catch (e) {
       const status = document.getElementById('map-status');
       if (status) {

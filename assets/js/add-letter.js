@@ -35,9 +35,13 @@
   function showFatal(msg) {
     const wrap = $('author-fatal');
     if (wrap) {
-      wrap.dataset.visible = 'true';
+      wrap.hidden = false;
       wrap.innerText = msg;
     }
+    // Also hide the gate screen so the user isn't left clicking a button that
+    // can't do anything (the init() bail leaves the gate handlers unwired).
+    const gate = $('gate-screen');
+    if (gate) gate.hidden = true;
   }
 
   function setStatus(msg, state = null) {

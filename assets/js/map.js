@@ -69,6 +69,7 @@
     homeBySoldier: new Map(), // creator name -> { home_canonical, home_id, home_lat, home_lon }
     pollTimer: null,
     pollFails: 0,
+    firstPollDone: false,  // suppress flash animation on the initial poll
   };
 
   // ─── Helpers ──────────────────────────────────────────────────────────────
@@ -535,13 +536,21 @@
     const newFeatures = fresh.filter((f) => !state.knownIds.has(f.properties.id));
 
     // Replace state.features with the fresh union (Omeka is the source of
-    // truth once polling starts). Preserves any client-only additions if
-    // we ever introduce them, but for now this is a straight swap.
+    // truth once polling starts). The seed's GeoJSON uses items.json ids
+    // (1-6) which don't line up with Omeka's auto-assigned 2-7+, so the
+    // first poll always reports every item as "new". Suppress flash on
+    // that initial pass — only animate items that arrive after the page
+    // has been open long enough to have a real baseline.
     state.features = fresh;
     for (const id of incomingIds) state.knownIds.add(id);
 
     applyMapData();
     renderSidebar();
+
+    if (!state.firstPollDone) {
+      state.firstPollDone = true;
+      return;
+    }
 
     if (newFeatures.length) {
       // Animate the most recent new feature (highest id wins if multiple).

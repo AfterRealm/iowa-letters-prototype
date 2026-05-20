@@ -161,11 +161,18 @@
       const v = (form.elements[name].value || '').trim();
       if (!v) errors.push(`${label} is required.`);
     }
+    return errors;
+  }
+
+  // Soft warning: place isn't in the gazetteer. Letter still saves; it just
+  // won't appear on the map until someone adds the place to the authority
+  // file. Returns a string warning or null.
+  function gazetteerWarning(form) {
     const place = (form.elements.place.value || '').trim();
     if (place && !state.placeIndex.has(place)) {
-      errors.push(`"${place}" is not in the gazetteer. Pick from the suggestions, or choose the closest match.`);
+      return `Heads up: "${place}" is not in the gazetteer authority file. The letter will be saved to Omeka, but it will not appear on the map until that place is added. Pick from the autocomplete list if you want the letter to render.`;
     }
-    return errors;
+    return null;
   }
 
   async function onSubmit(e) {
@@ -178,6 +185,7 @@
       setStatus(errors.join(' '), 'error');
       return;
     }
+    const gazWarn = gazetteerWarning(form);
 
     setStatus('Submitting to Omeka…');
     const payload = buildPayload(form);
@@ -196,7 +204,10 @@
         return;
       }
       const id = body['o:id'];
-      setStatus(`Letter added (Omeka item #${id}). The map will pick it up on its next poll.`, 'ok');
+      const okMsg = gazWarn
+        ? `Letter saved as Omeka item #${id}. ${gazWarn}`
+        : `Letter added (Omeka item #${id}). The map will pick it up on its next poll.`;
+      setStatus(okMsg, gazWarn ? 'warn' : 'ok');
 
       // Surface the success block + reset the form
       const successEl = $('author-success');

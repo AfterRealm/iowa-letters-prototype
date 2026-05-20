@@ -70,6 +70,8 @@
     pollTimer: null,
     pollFails: 0,
     firstPollDone: false,  // suppress flash animation on the initial poll
+    lastPollAt: null,      // ms timestamp of last successful poll
+    unplaceable: [],       // Omeka items that have no resolvable spatial
   };
 
   // ─── Helpers ──────────────────────────────────────────────────────────────
@@ -146,6 +148,34 @@
     document.querySelectorAll('#letter-list button').forEach((btn) => {
       btn.setAttribute('aria-current', String(Number(btn.dataset.id) === state.selectedId));
     });
+  }
+
+  // Surface Omeka items that couldn't be placed on the map (missing
+  // dcterms:spatial or spatial string not resolvable through the gazetteer).
+  // Curators can see what got skipped; demo visitors see honest gaps.
+  function renderUnplaceable() {
+    const section = document.getElementById('unplaceable-section');
+    if (!section) return;
+    if (!state.unplaceable.length) {
+      section.hidden = true;
+      return;
+    }
+    section.hidden = false;
+    const list = section.querySelector('ul');
+    const count = section.querySelector('[data-unplaceable-count]');
+    if (count) count.textContent = String(state.unplaceable.length);
+    list.innerHTML = '';
+    for (const u of state.unplaceable) {
+      const li = document.createElement('li');
+      const reason = u.spatial
+        ? `place "${escapeHtml(u.spatial)}" not in gazetteer`
+        : 'no location field on item';
+      li.innerHTML = `
+        <a href="/item.html?id=${encodeURIComponent(u.id)}">${escapeHtml(u.title)}</a>
+        <span class="unplaceable-reason">${reason}</span>
+      `;
+      list.appendChild(li);
+    }
   }
 
   // ─── Map layers ───────────────────────────────────────────────────────────
@@ -532,24 +562,52 @@
       if (!r.ok) throw new Error(`Omeka returned HTTP ${r.status}`);
       const items = await r.json();
       const fresh = [];
+      const unplaceable = [];
       for (const item of items) {
         const feat = omekaItemToFeature(item);
-        if (!feat) continue;
-        fresh.push(feat);
+        if (feat) {
+          fresh.push(feat);
+        } else {
+          // Capture title + spatial string so curators can see what got
+          // skipped and why. Both reasons (no spatial field, or spatial
+          // string not in gazetteer) land here.
+          const v = (key) => {
+            const arr = item[key];
+            return Array.isArray(arr) && arr.length ? arr[0]['@value'] : null;
+          };
+          unplaceable.push({
+            id: item['o:id'],
+            title: v('dcterms:title') || '(untitled)',
+            creator: v('dcterms:creator') || '',
+            spatial: v('dcterms:spatial') || null,
+          });
+        }
       }
+      state.unplaceable = unplaceable;
       mergeFeatures(fresh);
+      state.lastPollAt = Date.now();
       state.pollFails = 0;
       hidePollStatus();
     } catch (e) {
       state.pollFails += 1;
-      // Only surface a poll-failure banner after 3 consecutive misses, so a
-      // single hiccup doesn't startle the visitor.
       if (state.pollFails >= 3) {
+        const stale = state.lastPollAt
+          ? `Last successful update ${fmtElapsed(Date.now() - state.lastPollAt)} ago.`
+          : 'No successful poll yet this session.';
         showPollStatus(
-          `Live updates paused (cannot reach Omeka). The map shows the last good snapshot. Latest error: ${e.message}`
+          `Live updates paused (cannot reach Omeka). ${stale} Map shows the last good snapshot. Latest error: ${e.message}`
         );
       }
     }
+  }
+
+  function fmtElapsed(ms) {
+    const s = Math.floor(ms / 1000);
+    if (s < 60) return `${s}s`;
+    const m = Math.floor(s / 60);
+    if (m < 60) return `${m}m`;
+    const h = Math.floor(m / 60);
+    return `${h}h ${m % 60}m`;
   }
 
   function mergeFeatures(fresh) {
@@ -568,6 +626,7 @@
     refreshTimelineDomain();
     applyMapData();
     renderSidebar();
+    renderUnplaceable();
 
     if (!state.firstPollDone) {
       state.firstPollDone = true;

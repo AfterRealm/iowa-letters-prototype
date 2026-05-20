@@ -67,6 +67,11 @@
       <ul id="letter-list" class="letter-list" role="list">
         <li><em>Loading letters…</em></li>
       </ul>
+      <section id="unplaceable-section" class="unplaceable-section" hidden aria-labelledby="unplaceable-heading">
+        <h3 id="unplaceable-heading">Letters without a map location <span class="unplaceable-count">(<span data-unplaceable-count>0</span>)</span></h3>
+        <p class="field-help">Items in Omeka whose place cannot be plotted, either because no <code>dcterms:spatial</code> field was filled in or because the place is not in the <a href="/data/gazetteer.json">gazetteer authority file</a>. They still appear in <a href="/items.html">Browse Letters</a>.</p>
+        <ul role="list"></ul>
+      </section>
     </aside>
 
     <div class="map-container" aria-label="Interactive map of letter origins">

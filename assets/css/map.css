@@ -422,7 +422,7 @@
   font-size: 1rem;
   padding: 0.5rem 0.7rem;
   background: var(--paper);
-  border: 1px solid var(--rule);
+  border: 1px solid var(--accent);
   border-radius: 3px;
   color: var(--ink);
 }

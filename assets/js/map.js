@@ -408,7 +408,9 @@
       const ts = minTs + v * 86400000;
       const iso = new Date(ts).toISOString().slice(0, 10);
       state.currentDate = iso;
-      readout.textContent = `Through ${fmtDate(iso)}`;
+      const human = `Through ${fmtDate(iso)}`;
+      readout.textContent = human;
+      slider.setAttribute('aria-valuetext', human);
       applyMapData();
     }
     slider.addEventListener('input', updateFromSlider);

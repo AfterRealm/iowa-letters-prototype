@@ -24,13 +24,13 @@
 
 <div class="demo-banner">
   Portfolio prototype for the University of Iowa Libraries GIS Developer/Specialist position, by <a href="/about-this-build.html#about-me">Meredith Sealy</a>. <a href="/methodology.html#map">Read the map build notes.</a>
- <span class="build-tag" data-build-tag aria-label="Build version"></span></div>
+ <span class="build-tag" data-build-tag></span></div>
 
 <header class="site-banner">
   <div class="container">
     <div class="branding">
       <button type="button" class="seal-trigger screenshot-trigger" data-full-src="/assets/img/iowa-letters-seal.png" data-caption="Iowa Letters seal. AI-generated with Google Gemini (Nanobanana) from a prompt; background removed locally with Picasso Studio." aria-label="Open larger view: Iowa Letters seal">
-        <img class="site-seal" src="/apple-touch-icon.png" alt="Iowa Letters seal. Image generated with Google Gemini (Nanobanana)." width="180" height="180" />
+        <img class="site-seal" src="/apple-touch-icon.png" alt="" width="180" height="180" />
         <span class="screenshot-hover">View larger</span>
       </button>
       <div class="branding-text">
@@ -64,7 +64,9 @@
     <aside class="map-sidebar" aria-label="List of letters">
       <h2>Letters in chronological order</h2>
       <p class="field-help" style="margin-top: 0; margin-bottom: 0.7rem;">Click any letter to open it on the map.</p>
-      <ul id="letter-list" class="letter-list" role="list">
+      <ul id="letter-list" class="letter-list" role="list"
+          aria-live="polite" aria-relevant="additions"
+          aria-label="Letters in chronological order; updates when new entries are added">
         <li><em>Loading letters…</em></li>
       </ul>
       <section id="unplaceable-section" class="unplaceable-section" hidden aria-labelledby="unplaceable-heading">
@@ -76,7 +78,7 @@
 
     <div class="map-container" aria-label="Interactive map of letter origins">
       <div id="map-status" class="map-status" role="status" aria-live="polite"></div>
-      <div id="map" role="application" aria-label="Map: letters plotted at the place they were written from. Use the controls below to filter by date or toggle layers. The letter list to the left is keyboard-navigable as an alternative to the map."></div>
+      <div id="map" role="region" aria-label="Map of letter origins. The letter list in the sidebar is the keyboard-accessible alternative to this map; the timeline scrubber and toggle checkboxes below filter what's shown."></div>
     </div>
 
   </div>
@@ -131,12 +133,12 @@
   </nav>
   <div class="inner">
     <div>
-      <h4>About this prototype</h4>
+      <h3>About this prototype</h3>
       <p>Built as a portfolio piece for the GIS Developer/Specialist role at University of Iowa Libraries Information Technology, May 2026.</p>
       <p><a href="/methodology.html#map">Read the map build notes &rarr;</a></p>
     </div>
     <div>
-      <h4>Standards used</h4>
+      <h3>Standards used</h3>
       <p>WGS 84 (EPSG:4326) · GeoJSON (RFC 7946) · CSV with WKT · ESRI Shapefile · Dublin Core Terms · WCAG 2.2 AA</p>
     </div>
   </div>

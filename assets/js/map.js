@@ -74,8 +74,8 @@
   // ─── Helpers ──────────────────────────────────────────────────────────────
   function soldierKey(creator) {
     if (!creator) return 'other';
-    if (/hartwell/i.test(creator)) return 'hartwell';
-    if (/burroughs/i.test(creator)) return 'burroughs';
+    if (/^jonathan hartwell$/i.test(creator)) return 'hartwell';
+    if (/^elias burroughs$/i.test(creator)) return 'burroughs';
     return 'other';
   }
 
@@ -287,7 +287,28 @@
       },
     });
 
-    // Catch-all for any other creators (e.g. authored letters added live).
+    // Community-contributed letters (anything authored through /add-letter.html
+    // by someone other than the two seed soldiers). Distinct visual identity:
+    // bright accent gold with a heavy ink halo — clearly different from
+    // Hartwell's solid orange and Burroughs's blue bullseye, and reinforces
+    // the pulse-animation color so visitors recognize these as the
+    // live-update layer.
+    state.map.addLayer({
+      id: 'letter-other-halo',
+      type: 'circle',
+      source: 'letters',
+      filter: ['all',
+        ['!=', ['get', 'creator'], 'Jonathan Hartwell'],
+        ['!=', ['get', 'creator'], 'Elias Burroughs'],
+      ],
+      paint: {
+        'circle-radius': 12,
+        'circle-color': '#1a1410',
+        'circle-opacity': 0.0,
+        'circle-stroke-color': '#1a1410',
+        'circle-stroke-width': 3,
+      },
+    });
     state.map.addLayer({
       id: 'letter-other',
       type: 'circle',
@@ -298,14 +319,14 @@
       ],
       paint: {
         'circle-radius': 8,
-        'circle-color': '#7a6a4a',
+        'circle-color': '#e5b94a',
         'circle-stroke-color': '#1a1410',
-        'circle-stroke-width': 2,
+        'circle-stroke-width': 1.5,
       },
     });
 
     // Hover affordance
-    for (const id of ['letter-hartwell', 'letter-burroughs-outer', 'letter-burroughs', 'letter-other']) {
+    for (const id of ['letter-hartwell', 'letter-burroughs-outer', 'letter-burroughs', 'letter-other-halo', 'letter-other']) {
       state.map.on('mouseenter', id, () => { state.map.getCanvas().style.cursor = 'pointer'; });
       state.map.on('mouseleave', id, () => { state.map.getCanvas().style.cursor = ''; });
       state.map.on('click', id, (e) => {

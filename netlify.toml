@@ -16,7 +16,7 @@
 # "credentials not configured" message rather than failing silently.
 
 [build]
-  command = "node scripts/build-author-key.js"
+  command = "node scripts/build-version.js && node scripts/build-author-key.js"
   publish = "."
 
 [[redirects]]

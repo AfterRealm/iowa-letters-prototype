@@ -4,6 +4,23 @@
  * Color palette grounded in academic library conventions (Iowa gold + paper + ink).
  */
 
+.build-tag {
+  display: inline-block;
+  font-family: 'Cascadia Code', Consolas, 'Courier New', monospace;
+  font-size: 0.72rem;
+  padding: 0.05rem 0.45rem;
+  margin-left: 0.6rem;
+  background: rgba(248, 244, 234, 0.18);
+  color: #f0e8d2;
+  border-radius: 2px;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  vertical-align: 0.05em;
+}
+.build-tag:empty {
+  display: none;
+}
+
 :root {
   --paper:        #f8f4ea;
   --paper-soft:   #f0e9d7;

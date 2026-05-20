@@ -310,7 +310,17 @@ function initBackToTop() {
   btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 }
 
+function initBuildTag() {
+  const v = window.SITE_VERSION;
+  if (!v) return;
+  document.querySelectorAll('[data-build-tag]').forEach((el) => {
+    el.textContent = v.display;
+    el.title = `Built ${v.builtAt} from ${v.sha}${v.branch ? ' on ' + v.branch : ''}`;
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+  initBuildTag();
   initIndexPage();
   initItemPage();
   initShotViewer();

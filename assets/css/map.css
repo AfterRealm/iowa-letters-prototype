@@ -99,6 +99,16 @@
   border: 2px solid #1a1410;
 }
 
+.letter-list .lt-marker.other {
+  border-radius: 50%;
+  background: #e5b94a;
+  border: 2px solid #1a1410;
+  box-shadow: 0 0 0 2px #1a1410;
+  width: 0.7rem;
+  height: 0.7rem;
+  margin: 0.1rem;
+}
+
 .letter-list .lt-meta {
   display: flex;
   flex-direction: column;
@@ -215,6 +225,15 @@
   border-radius: 50%;
   background: radial-gradient(circle, #f4ecd5 0 30%, #2c5e7f 30% 100%);
   border: 2px solid #1a1410;
+}
+.legend .lt-marker.other {
+  border-radius: 50%;
+  background: #e5b94a;
+  border: 2px solid #1a1410;
+  box-shadow: 0 0 0 2px #1a1410;
+  width: 0.7rem;
+  height: 0.7rem;
+  margin: 0.1rem;
 }
 .legend .lt-marker.home {
   background: #6da855;

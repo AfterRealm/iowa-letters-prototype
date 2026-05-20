@@ -10,3 +10,6 @@ node_modules/
 # deploy time via Netlify build env vars (see map-methodology.html). Never
 # committed.
 /assets/js/author-key.js
+
+# Version stamp — generated at deploy time from VERSION + git SHA.
+/assets/js/version.js

@@ -146,6 +146,50 @@ function renderItemDetail(item) {
   `;
 }
 
+// Flatten an Omeka S item record into the same shape the static items.json
+// uses, so renderItemDetail can render it without branching. Omeka stores
+// each Dublin Core property as an array of value objects; we unwrap the
+// first @value for display purposes.
+function omekaItemToDisplay(omeka) {
+  const v = (key) => {
+    const arr = omeka[key];
+    return Array.isArray(arr) && arr.length ? arr[0]['@value'] : null;
+  };
+  const subjects = (omeka['dcterms:subject'] || []).map((x) => x['@value']).filter(Boolean);
+  return {
+    'o:id': omeka['o:id'],
+    'dcterms:title': v('dcterms:title'),
+    'dcterms:creator': v('dcterms:creator'),
+    'dcterms:date': v('dcterms:date'),
+    'dcterms:type': v('dcterms:type'),
+    'dcterms:format': v('dcterms:format'),
+    'dcterms:language': v('dcterms:language'),
+    'dcterms:subject': subjects,
+    'dcterms:spatial': v('dcterms:spatial'),
+    'dcterms:temporal': v('dcterms:temporal'),
+    'dcterms:rights': v('dcterms:rights'),
+    'dcterms:source': v('dcterms:source'),
+    transcription: v('dcterms:description'),
+    regiment: omeka.regiment || null,
+    company: omeka.company || null,
+    addressee: omeka.addressee || null,
+    thumb: '/assets/img/manuscript-placeholder.svg',
+    iiif_manifest: 'https://iiif.io/api/cookbook/recipe/0001-mvm-image/manifest.json',
+  };
+}
+
+const OMEKA_API_BASE = 'https://iowa.dev.01.ngrok.dev/api';
+
+async function loadItemFromOmeka(id) {
+  const r = await fetch(`${OMEKA_API_BASE}/items/${id}`, {
+    cache: 'no-cache',
+    headers: { 'ngrok-skip-browser-warning': 'true' },
+  });
+  if (!r.ok) throw new Error(`Omeka returned HTTP ${r.status}`);
+  const omeka = await r.json();
+  return omekaItemToDisplay(omeka);
+}
+
 function initItemPage() {
   const detailEl = document.getElementById('item-detail');
   if (!detailEl) return;
@@ -155,17 +199,43 @@ function initItemPage() {
     detailEl.innerHTML = '<p>No item ID provided. <a href="/items.html">Browse all letters.</a></p>';
     return;
   }
-  loadItems().then(items => {
-    const item = items.find(i => i['o:id'] === id);
-    if (!item) {
-      detailEl.innerHTML = `<p>Item ${escapeHtml(id)} not found. <a href="/items.html">Browse all letters.</a></p>`;
+
+  // Omeka is the source of truth. Try it first; fall back to the static seed
+  // (items.json) only if Omeka is unreachable or the id isn't there. The
+  // static seed uses items.json ids 1-6 which don't line up with Omeka's
+  // auto-assigned 2-7, so the title-match fallback is also tried before
+  // giving up.
+  (async function loadById() {
+    try {
+      const item = await loadItemFromOmeka(id);
+      document.title = `${item['dcterms:title']} · Iowa Letters`;
+      detailEl.innerHTML = renderItemDetail(item);
       return;
+    } catch (omekaErr) {
+      // Fall through to the static seed
+      try {
+        const items = await loadItems();
+        let item = items.find(i => i['o:id'] === id);
+        if (item) {
+          document.title = `${item['dcterms:title']} · Iowa Letters`;
+          detailEl.innerHTML = renderItemDetail(item);
+          return;
+        }
+        detailEl.innerHTML = `
+          <p><a href="/items.html">&larr; Back to all letters</a></p>
+          <h1>Item not found</h1>
+          <p>Letter <code>${escapeHtml(id)}</code> could not be resolved against either the live Omeka backend or the static seed.</p>
+          <ul>
+            <li>If you just submitted this letter via <a href="/add-letter.html">/add-letter.html</a>, the live Omeka backend may be temporarily unreachable — try again in a few seconds.</li>
+            <li>Open the <a href="/map.html">map view</a> to see all currently visible letters.</li>
+            <li>Omeka error: <code>${escapeHtml(omekaErr.message)}</code>.</li>
+          </ul>
+        `;
+      } catch (seedErr) {
+        detailEl.innerHTML = `<p class="muted">Could not load item from Omeka (${escapeHtml(omekaErr.message)}) or from the static seed (${escapeHtml(seedErr.message)}).</p>`;
+      }
     }
-    document.title = `${item['dcterms:title']} · Iowa Letters`;
-    detailEl.innerHTML = renderItemDetail(item);
-  }).catch(err => {
-    detailEl.innerHTML = `<p class="muted">Could not load item: ${escapeHtml(err.message)}</p>`;
-  });
+  })();
 }
 
 function ensureShotViewer() {

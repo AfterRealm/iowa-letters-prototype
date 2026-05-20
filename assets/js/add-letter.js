@@ -96,10 +96,23 @@
       for (const a of p.aliases || []) state.placeIndex.set(a, p);
     }
 
+    // Sort the picklist alphabetically by state, then by the location name
+    // within state. The gazetteer file keeps its narrative theater ordering;
+    // the dropdown gets a usability-first sort.
+    function sortKey(place) {
+      const parts = (place.canonical || '').split(',').map((s) => s.trim());
+      const state = parts[1] || 'ZZZ';
+      const name = parts[0] || '';
+      return `${state.toLowerCase()}|${name.toLowerCase()}`;
+    }
+    const sorted = [...state.gazetteer].sort((a, b) =>
+      sortKey(a).localeCompare(sortKey(b))
+    );
+
     const list = $('place-options');
     if (list) {
       list.innerHTML = '';
-      for (const p of state.gazetteer) {
+      for (const p of sorted) {
         const opt = document.createElement('option');
         opt.value = p.canonical;
         const theaterLabel = (g.theaters && g.theaters[p.theater] && g.theaters[p.theater].label) || p.theater;

@@ -106,7 +106,11 @@ function renderItemDetail(item) {
   ];
 
   return `
-    <p><a href="/items.html">&larr; Back to all letters</a></p>
+    <p class="item-back-links">
+      <a href="/items.html">&larr; Back to all letters</a>
+      <span aria-hidden="true"> · </span>
+      <a href="/map.html?focus=${encodeURIComponent(item['o:id'])}">Open on the map &rarr;</a>
+    </p>
     <h1>${escapeHtml(item['dcterms:title'])}</h1>
     <p class="lede">A letter from ${escapeHtml(item['dcterms:creator'])}, ${escapeHtml(item.regiment)}, written ${escapeHtml(item['dcterms:date'])} from ${escapeHtml(item['dcterms:spatial'])}.</p>
 

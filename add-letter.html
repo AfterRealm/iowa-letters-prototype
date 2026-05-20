@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Add a Letter · Iowa Letters · A Civil War Digital Edition</title>
+<meta name="description" content="The public authoring form for the Iowa Letters prototype. Behind a passphrase, this form writes a new letter directly to the Omeka S backend via the REST API, where it joins the live map." />
+<link rel="icon" type="image/x-icon" href="/favicon.ico" />
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+<link rel="manifest" href="/site.webmanifest" />
+<meta name="theme-color" content="#16202c" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/assets/css/site.css" />
+<link rel="stylesheet" href="/assets/css/map.css" />
+<meta name="robots" content="noindex, nofollow" />
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<div class="demo-banner">
+  Portfolio prototype for the University of Iowa Libraries GIS Developer/Specialist position, by <a href="/about-this-build.html#about-me">Meredith Sealy</a>. <a href="/authoring-pipeline.html">Read the authoring pipeline notes.</a>
+</div>
+
+<header class="site-banner">
+  <div class="container">
+    <div class="branding">
+      <button type="button" class="seal-trigger screenshot-trigger" data-full-src="/assets/img/iowa-letters-seal.png" data-caption="Iowa Letters seal. AI-generated with Google Gemini (Nanobanana) from a prompt; background removed locally with Picasso Studio." aria-label="Open larger view: Iowa Letters seal">
+        <img class="site-seal" src="/apple-touch-icon.png" alt="Iowa Letters seal. Image generated with Google Gemini (Nanobanana)." width="180" height="180" />
+        <span class="screenshot-hover">View larger</span>
+      </button>
+      <div class="branding-text">
+        <div class="institution">A prototype for: University of Iowa Libraries · Digital Scholarship &amp; Publishing Studio</div>
+        <p class="edition-title">Iowa Letters</p>
+        <p class="tagline">A Digital Edition of Civil War Correspondence from Iowa Volunteers</p>
+      </div>
+    </div>
+  </div>
+  <nav class="primary" aria-label="Primary">
+    <div class="container">
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/items.html">Browse Letters</a></li>
+        <li><a href="/map.html">Map</a></li>
+        <li><a href="/add-letter.html" aria-current="page">Add a Letter</a></li>
+        <li><a href="/methodology.html">Methodology</a></li>
+        <li><a href="/about-this-build.html">About this Build</a></li>
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<main id="main" tabindex="-1">
+
+  <h1>Add a Letter</h1>
+  <p class="lede">This form writes a new letter directly to the Omeka S backend. Once Omeka accepts it, the map view picks it up on its next short-poll and the new pin appears with a brief animation. You are the author of the entry — your contribution joins the existing six letters as part of the prototype's live data.</p>
+
+  <div class="callout">
+    <h3>Why this exists</h3>
+    <p>The GIS Developer/Specialist role at LIT names <em>supporting digital mapping projects from inception through completion, including workflow optimization</em> as a core responsibility. This authoring form is the small piece of that loop you can use right now: a Research Manager partnering with the Studio on a faculty-led project shouldn't have to learn the Omeka admin to add a record to a public map. They should be able to fill in a form. Here is that form. Full pipeline notes on the <a href="/authoring-pipeline.html">Authoring Pipeline page</a>.</p>
+  </div>
+
+  <div class="author-shell">
+
+    <div id="author-fatal" class="map-status" role="alert" aria-live="assertive"></div>
+
+    <section id="gate-screen" class="gate-screen" aria-labelledby="gate-heading">
+      <h2 id="gate-heading">Passphrase required</h2>
+      <p>The passphrase is in the cover letter that pointed you here. It is a soft gate — meant to keep casual visitors out, not to be a real authentication boundary. In production, this form would sit behind University of Iowa institutional SSO.</p>
+      <div class="field-row">
+        <label for="gate-passphrase">Passphrase</label>
+        <input type="password" id="gate-passphrase" autocomplete="off" inputmode="text" />
+        <p id="gate-error" class="field-help" role="alert" hidden></p>
+      </div>
+      <button type="button" id="gate-submit" class="btn-iowa">Unlock the form</button>
+    </section>
+
+    <form id="author-form" hidden novalidate aria-labelledby="form-heading">
+      <h2 id="form-heading">Letter details</h2>
+      <p class="field-help">All fields marked <strong>required</strong> are needed before submission. Use the place autocomplete — the gazetteer ships ~40 Civil War theater locations.</p>
+
+      <div class="field-row">
+        <label for="title">Title of the letter <span aria-hidden="true">*</span><span class="sr-only"> (required)</span></label>
+        <input type="text" id="title" name="title" required maxlength="200" autocomplete="off" />
+        <p class="field-help">A short descriptive title. Example: <em>Letter from Chattanooga, October 1863</em>.</p>
+      </div>
+
+      <div class="field-row">
+        <label for="creator">Author / soldier's name <span aria-hidden="true">*</span><span class="sr-only"> (required)</span></label>
+        <input type="text" id="creator" name="creator" required maxlength="120" autocomplete="off" />
+        <p class="field-help">Use the form <em>Firstname Lastname</em>. The map keys color and shape off the first surviving letter's author per soldier.</p>
+      </div>
+
+      <div class="field-row">
+        <label for="date">Date written</label>
+        <input type="date" id="date" name="date" min="1861-04-01" max="1865-06-01" />
+        <p class="field-help">Any date between April 1861 (Fort Sumter) and June 1865 (regimental mustering-out).</p>
+      </div>
+
+      <div class="field-row">
+        <label for="place">Place written from <span aria-hidden="true">*</span><span class="sr-only"> (required)</span></label>
+        <input type="text" id="place" name="place" required list="place-options" autocomplete="off" />
+        <datalist id="place-options"></datalist>
+        <p class="field-help">Pick from the gazetteer. The map places the pin at the WGS 84 coordinate keyed to that canonical place name.</p>
+      </div>
+
+      <div class="field-row">
+        <label for="regiment">Regiment</label>
+        <input type="text" id="regiment" name="regiment" maxlength="120" autocomplete="off" />
+        <p class="field-help">Example: <em>16th Iowa Volunteer Infantry</em>. Stored on the item but not yet mapped to a custom property — Phase 2.</p>
+      </div>
+
+      <div class="field-row">
+        <label for="company">Company</label>
+        <input type="text" id="company" name="company" maxlength="40" autocomplete="off" />
+      </div>
+
+      <div class="field-row">
+        <label for="addressee">Addressee</label>
+        <input type="text" id="addressee" name="addressee" maxlength="200" autocomplete="off" />
+        <p class="field-help">Example: <em>Sarah Hartwell, Cedar County, Iowa</em>. The map uses the comma-separated home county to draw the optional line back to Iowa.</p>
+      </div>
+
+      <div class="field-row">
+        <label for="transcription">Transcription</label>
+        <textarea id="transcription" name="transcription" maxlength="6000"></textarea>
+        <p class="field-help">A short transcription is enough — the popup truncates politely on the map. Letters of any length are accepted in the underlying record.</p>
+      </div>
+
+      <div class="submit-row">
+        <button type="submit" class="btn-iowa">Submit to the live map</button>
+        <span id="submit-status" class="submit-status" role="status" aria-live="polite"></span>
+      </div>
+    </form>
+
+    <section id="author-success" class="callout" hidden aria-labelledby="success-heading" style="margin-top: 2rem;">
+      <h3 id="success-heading">Letter submitted</h3>
+      <p>Your letter is now in the Omeka backend and the map view will pick it up on its next short-poll (every 10 to 15 seconds).</p>
+      <p><a id="author-success-link" href="/map.html" class="btn-iowa">Open the map to see it &rarr;</a></p>
+    </section>
+
+  </div>
+
+  <h2>What happens when you submit</h2>
+  <ol>
+    <li>The form payload is shaped into a Dublin Core item record with the same field structure the existing six letters use (title, creator, date, type, language, spatial, description, rights, source).</li>
+    <li>The payload is POSTed to the Omeka S REST API as the <code>iowa-letters-author</code> user — a role-bounded account whose only permission is to create new items.</li>
+    <li>Omeka writes the record to its MariaDB instance and returns the new item id.</li>
+    <li>The map view polls Omeka every ten to fifteen seconds. On the next poll your letter appears with a brief flash and zoom-to animation.</li>
+    <li>You can verify by opening the map in a separate tab before submitting; you'll see the pin land in real time.</li>
+  </ol>
+
+  <p>Full details on the authoring pipeline, the role-bounded Omeka user model, and the production-vs-prototype security tradeoffs are on the <a href="/authoring-pipeline.html">Authoring Pipeline methodology page</a>.</p>
+
+</main>
+
+<footer class="site-footer">
+  <nav class="footer-nav" aria-label="Footer">
+    <ul>
+      <li><a href="/">Home</a></li>
+      <li><a href="/items.html">Browse Letters</a></li>
+      <li><a href="/map.html">Map</a></li>
+      <li><a href="/add-letter.html" aria-current="page">Add a Letter</a></li>
+      <li><a href="/methodology.html">Methodology</a></li>
+      <li><a href="/about-this-build.html">About this Build</a></li>
+    </ul>
+  </nav>
+  <div class="inner">
+    <div>
+      <h4>About this prototype</h4>
+      <p>Built as a portfolio piece for the GIS Developer/Specialist role at University of Iowa Libraries Information Technology, May 2026.</p>
+      <p><a href="/authoring-pipeline.html">Read the authoring pipeline notes &rarr;</a></p>
+    </div>
+    <div>
+      <h4>Standards used</h4>
+      <p>Dublin Core Terms (DCMI) · Omeka S REST API · WGS 84 (EPSG:4326) · WCAG 2.2 AA</p>
+    </div>
+  </div>
+</footer>
+
+<script src="/assets/js/author-key.js" defer></script>
+<script src="/assets/js/add-letter.js" defer></script>
+<script src="/assets/js/site.js" defer></script>
+</body>
+</html>

@@ -5,3 +5,8 @@ node_modules/
 
 # Local Netlify folder
 .netlify
+
+# Omeka author API key — generated locally by the Omeka admin and injected at
+# deploy time via Netlify build env vars (see map-methodology.html). Never
+# committed.
+/assets/js/author-key.js

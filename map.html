@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Map · Iowa Letters · A Civil War Digital Edition</title>
+<meta name="description" content="An interactive map of the Iowa Letters digital edition. Each surviving letter is plotted at the place it was written from, with an optional line drawn back to the soldier's home county in Iowa. A timeline scrubber filters by date across the 1862 to 1865 arc of the war." />
+<link rel="icon" type="image/x-icon" href="/favicon.ico" />
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+<link rel="manifest" href="/site.webmanifest" />
+<meta name="theme-color" content="#16202c" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" />
+<link rel="stylesheet" href="/assets/css/site.css" />
+<link rel="stylesheet" href="/assets/css/map.css" />
+<meta name="robots" content="noindex, nofollow" />
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<div class="demo-banner">
+  Portfolio prototype for the University of Iowa Libraries GIS Developer/Specialist position, by <a href="/about-this-build.html#about-me">Meredith Sealy</a>. <a href="/map-methodology.html">Read the map build notes.</a>
+</div>
+
+<header class="site-banner">
+  <div class="container">
+    <div class="branding">
+      <button type="button" class="seal-trigger screenshot-trigger" data-full-src="/assets/img/iowa-letters-seal.png" data-caption="Iowa Letters seal. AI-generated with Google Gemini (Nanobanana) from a prompt; background removed locally with Picasso Studio." aria-label="Open larger view: Iowa Letters seal">
+        <img class="site-seal" src="/apple-touch-icon.png" alt="Iowa Letters seal. Image generated with Google Gemini (Nanobanana)." width="180" height="180" />
+        <span class="screenshot-hover">View larger</span>
+      </button>
+      <div class="branding-text">
+        <div class="institution">A prototype for: University of Iowa Libraries · Digital Scholarship &amp; Publishing Studio</div>
+        <p class="edition-title">Iowa Letters</p>
+        <p class="tagline">A Digital Edition of Civil War Correspondence from Iowa Volunteers</p>
+      </div>
+    </div>
+  </div>
+  <nav class="primary" aria-label="Primary">
+    <div class="container">
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/items.html">Browse Letters</a></li>
+        <li><a href="/map.html" aria-current="page">Map</a></li>
+        <li><a href="/add-letter.html">Add a Letter</a></li>
+        <li><a href="/methodology.html">Methodology</a></li>
+        <li><a href="/about-this-build.html">About this Build</a></li>
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<main id="main" tabindex="-1">
+
+  <h1>Map of the Letters</h1>
+  <p class="lede map-page-lede">Each surviving letter is plotted at the place it was written from. Drag, zoom, and click any marker to read the transcription. A line back to the soldier's home county in Iowa can be toggled on; the timeline scrubber filters the visible letters by date.</p>
+
+  <div class="map-shell">
+
+    <aside class="map-sidebar" aria-label="List of letters">
+      <h2>Letters in chronological order</h2>
+      <p class="field-help" style="margin-top: 0; margin-bottom: 0.7rem;">Click any letter to open it on the map.</p>
+      <ul id="letter-list" class="letter-list" role="list">
+        <li><em>Loading letters…</em></li>
+      </ul>
+    </aside>
+
+    <div class="map-container" aria-label="Interactive map of letter origins">
+      <div id="map-status" class="map-status" role="status" aria-live="polite"></div>
+      <div id="map" role="application" aria-label="Map: letters plotted at the place they were written from. Use the controls below to filter by date or toggle layers. The letter list to the left is keyboard-navigable as an alternative to the map."></div>
+    </div>
+
+  </div>
+
+  <div class="map-controls" role="region" aria-label="Map controls">
+    <div class="row">
+      <div class="timeline-wrap">
+        <label for="timeline-slider">Timeline (show letters written on or before this date)</label>
+        <input type="range" id="timeline-slider" min="0" max="100" value="100" step="1" aria-describedby="timeline-readout" />
+        <span class="timeline-readout" id="timeline-readout" aria-live="polite">Through —</span>
+      </div>
+
+      <div class="legend" role="group" aria-label="Map legend">
+        <span class="swatch"><span class="lt-marker hartwell" aria-hidden="true"></span> Jonathan Hartwell</span>
+        <span class="swatch"><span class="lt-marker burroughs" aria-hidden="true"></span> Elias Burroughs</span>
+        <span class="swatch"><span class="lt-marker home" aria-hidden="true"></span> Home county</span>
+      </div>
+    </div>
+
+    <div class="row">
+      <label>
+        <input type="checkbox" id="toggle-home-counties" checked />
+        Show home counties in Iowa
+      </label>
+      <label>
+        <input type="checkbox" id="toggle-home-lines" />
+        Draw lines from each letter to its home county
+      </label>
+    </div>
+  </div>
+
+  <h2>What the map shows</h2>
+  <p>The six letters in the prototype span the western half of the Civil War theater. The 16th Iowa Volunteer Infantry was raised in early 1862 and trained at Camp McClellan in Davenport. The regiment then moved south through Memphis to the Vicksburg campaign, on through the Atlanta campaign in 1864, the March to the Sea, and finally the Carolinas Campaign in early 1865. Every place plotted on this map corresponds to a real movement of an Iowa regiment in the war.</p>
+
+  <p>The descriptive metadata in Omeka stores the place name (under <code>dcterms:spatial</code>) as a literal string. The mapping from that string to a coordinate happens in the presentation layer, against a <a href="/data/gazetteer.json">curated gazetteer</a>. That separation is intentional: it keeps the descriptive metadata clean (descriptive metadata should describe, not encode geometry), and it lets the same gazetteer feed both the map view here and the autocomplete in the <a href="/add-letter.html">authoring UI</a>.</p>
+
+  <p>Full details of the data pipeline, the gazetteer authority pattern, and the accessibility approach for an interactive map are on the <a href="/map-methodology.html">Map Methodology page</a>.</p>
+
+</main>
+
+<footer class="site-footer">
+  <nav class="footer-nav" aria-label="Footer">
+    <ul>
+      <li><a href="/">Home</a></li>
+      <li><a href="/items.html">Browse Letters</a></li>
+      <li><a href="/map.html" aria-current="page">Map</a></li>
+      <li><a href="/add-letter.html">Add a Letter</a></li>
+      <li><a href="/methodology.html">Methodology</a></li>
+      <li><a href="/about-this-build.html">About this Build</a></li>
+    </ul>
+  </nav>
+  <div class="inner">
+    <div>
+      <h4>About this prototype</h4>
+      <p>Built as a portfolio piece for the GIS Developer/Specialist role at University of Iowa Libraries Information Technology, May 2026.</p>
+      <p><a href="/map-methodology.html">Read the map build notes &rarr;</a></p>
+    </div>
+    <div>
+      <h4>Standards used</h4>
+      <p>WGS 84 (EPSG:4326) · GeoJSON (RFC 7946) · CSV with WKT · ESRI Shapefile · Dublin Core Terms · WCAG 2.2 AA</p>
+    </div>
+  </div>
+</footer>
+
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js" defer></script>
+<script src="/assets/js/map.js" defer></script>
+<script src="/assets/js/site.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Map Methodology · Iowa Letters · A Civil War Digital Edition</title>
+<meta name="description" content="Build notes for the Iowa Letters map view: data pipeline, gazetteer authority pattern, mapping library selection, accessibility approach, and the production vs. prototype trade-offs." />
+<link rel="icon" type="image/x-icon" href="/favicon.ico" />
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+<link rel="manifest" href="/site.webmanifest" />
+<meta name="theme-color" content="#16202c" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/assets/css/site.css" />
+<meta name="robots" content="noindex, nofollow" />
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<div class="demo-banner">
+  Portfolio prototype for the University of Iowa Libraries GIS Developer/Specialist position, by <a href="/about-this-build.html#about-me">Meredith Sealy</a>. <a href="/map.html">Back to the map.</a>
+</div>
+
+<header class="site-banner">
+  <div class="container">
+    <div class="branding">
+      <button type="button" class="seal-trigger screenshot-trigger" data-full-src="/assets/img/iowa-letters-seal.png" data-caption="Iowa Letters seal. AI-generated with Google Gemini (Nanobanana) from a prompt; background removed locally with Picasso Studio." aria-label="Open larger view: Iowa Letters seal">
+        <img class="site-seal" src="/apple-touch-icon.png" alt="Iowa Letters seal. Image generated with Google Gemini (Nanobanana)." width="180" height="180" />
+        <span class="screenshot-hover">View larger</span>
+      </button>
+      <div class="branding-text">
+        <div class="institution">A prototype for: University of Iowa Libraries · Digital Scholarship &amp; Publishing Studio</div>
+        <p class="edition-title">Iowa Letters</p>
+        <p class="tagline">A Digital Edition of Civil War Correspondence from Iowa Volunteers</p>
+      </div>
+    </div>
+  </div>
+  <nav class="primary" aria-label="Primary">
+    <div class="container">
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/items.html">Browse Letters</a></li>
+        <li><a href="/map.html">Map</a></li>
+        <li><a href="/add-letter.html">Add a Letter</a></li>
+        <li><a href="/methodology.html">Methodology</a></li>
+        <li><a href="/about-this-build.html">About this Build</a></li>
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<main id="main" tabindex="-1">
+
+  <h1>Map Methodology</h1>
+  <p class="lede">Build notes for the map view: how letters get from <code>dcterms:spatial</code> strings in Omeka to pins on a MapLibre map, why a controlled-vocabulary gazetteer sits between them, and which library and data-format choices reflect the named requirements of the LIT GIS Developer role.</p>
+
+  <h2>The data pipeline</h2>
+  <p>The map is the consumer end of a small pipeline that takes the digital edition's source records and produces three interchange-format outputs in parallel.</p>
+
+  <pre style="background: var(--paper-soft); border: 1px solid var(--rule); border-radius: 3px; padding: 0.9rem 1rem; overflow-x: auto; font-family: 'Cascadia Code', Consolas, monospace; font-size: 0.85rem; line-height: 1.6;">data/items.json        ── source records (Dublin Core)
+data/gazetteer.json    ── curated place authority (canonical name → WGS 84)
+       │
+       ▼  scripts/build-spatial.py  (pure Python + pyshp)
+       │
+       ├── data/letters.geojson    RFC 7946 FeatureCollection
+       ├── data/letters.csv        flat tabular with WKT geometry column
+       └── data/letters.shp + .shx + .dbf + .prj   ESRI Shapefile</pre>
+
+  <p>The pipeline is a single small Python script (<a href="https://github.com/AfterRealm/iowa-letters-prototype/blob/gis-map/scripts/build-spatial.py" rel="external">scripts/build-spatial.py</a>) chosen over <code>geopandas</code> or <code>fiona</code> because the dataset is small and the dependency footprint should match what's likely already installed on a Libraries IT workstation. The same shape of work in a production geoprocessing context would be done with <strong>ArcPy</strong> (against an ArcGIS Pro project) or <strong>PyQGIS</strong> (against a QGIS project) — both are drop-in replacements for the few transformations this script does. The current implementation depends only on <code>pyshp</code> for Shapefile serialization, so the pipeline reproduces on any machine with Python 3.9+ and pip.</p>
+
+  <h3>Why all three formats</h3>
+  <p>The GIS Developer/Specialist posting names <strong>GeoJSON, SHP, CSV, and XML</strong> as the geospatial data formats Libraries IT staff are expected to be comfortable with. Emitting all three readable formats from a single source of truth is the right pattern for a digital scholarship project: different audiences need different formats.</p>
+  <ul>
+    <li><strong>GeoJSON</strong> (<a href="https://datatracker.ietf.org/doc/html/rfc7946" rel="external">RFC 7946</a>) is what the MapLibre client consumes. It's also the lingua franca of contemporary web mapping; any researcher who knows the format can drop it into QGIS, Leaflet, kepler.gl, or open it in pandas with <code>geopandas.read_file</code>.</li>
+    <li><strong>CSV</strong> is the format faculty often have in hand from their own research — a spreadsheet of places. Producing CSV with a <code>POINT(lon lat)</code> WKT column means the same dataset can be opened in Excel, loaded into QGIS as a delimited-text layer, or ingested by tabular tools.</li>
+    <li><strong>Shapefile</strong> is still the ESRI interchange format. It's how a library exchanges geospatial data with state-level GIS offices, the Big Ten Academic Alliance Geospatial Network (BTAA-GIN), and any team built around ArcGIS Pro. Generating it from the same source keeps the formats from drifting.</li>
+    <li>(<strong>XML</strong> is honored through the JSON-LD context — Dublin Core's native serialization — and through the optional <code>.prj</code> sidecar, which is WKT text inside the Shapefile bundle. A full FGDC or ISO 19139 metadata XML would be the production deliverable; for the prototype, the GeoJSON-level <code>metadata</code> block stands in.)</li>
+  </ul>
+
+  <h2 id="gazetteer">The gazetteer authority pattern</h2>
+  <p>Letters in Omeka store the place written from as a literal string in <code>dcterms:spatial</code> (for example <em>"Near Vicksburg, Mississippi, United States"</em>). They do not carry coordinates. The mapping from that string to a WGS 84 coordinate happens in the presentation layer, against a curated gazetteer file: <a href="/data/gazetteer.json"><code>data/gazetteer.json</code></a>.</p>
+
+  <p>This is intentional. There are three reasons not to bake geometry into the descriptive metadata of a digital edition record:</p>
+  <ol>
+    <li><strong>Descriptive metadata should describe.</strong> A literal string place name (especially one drawn from a controlled vocabulary like the Library of Congress Subject Headings) is the durable, citable, machine-readable thing. Coordinates are derived data — useful for visualization, but they shift as digital geography is refined, projection conventions change, and gazetteers update. Keeping them out of the curatorial record means the record stays correct as the geography around it evolves.</li>
+    <li><strong>One authority file, many consumers.</strong> The same gazetteer that feeds the map's geocoding also feeds the autocomplete in the <a href="/add-letter.html">authoring UI</a>. Replacing the gazetteer with GeoNames, with the Library of Congress NAF, or with a project-curated Linked Open Data graph is a single-file change. Every record stays untouched.</li>
+    <li><strong>Faculty partnership.</strong> A faculty PI deciding what place name to use for a record is making a curatorial decision, not a coordinate decision. The vocabulary should match how they cite the place in their writing.</li>
+  </ol>
+
+  <p>The current gazetteer ships 39 entries spanning seven Civil War theaters of operations: Iowa mustering points, Iowa home counties, the Western Theater, the Atlanta Campaign, March to the Sea, the Carolinas Campaign, and the Eastern Theater. Each entry carries a canonical name, an alias list (so the gazetteer matches both <em>"Davenport"</em> and <em>"Davenport, Iowa, United States"</em>), the WGS 84 coordinate at four-decimal precision (roughly eleven meters), a kind, a theater grouping, and an optional historical note. Coordinates are public-domain values rounded from authoritative sources (USGS, GNIS, or the National Park Service for battlefields).</p>
+
+  <h2>Why MapLibre GL JS</h2>
+  <p>The posting names three web mapping libraries as required experience: <strong>Leaflet, Mapbox GL JS, and MapLibre GL JS</strong>. This prototype uses MapLibre GL JS as the primary library. The choice reflects three considerations:</p>
+  <ul>
+    <li><strong>License posture.</strong> Mapbox GL JS went from open source to a proprietary license in 2020. MapLibre GL JS is the open-source community fork of the last permissive version, and it's where active development continues for open-license web mapping. For a public-funded library, the institutional cost story is meaningfully cleaner with MapLibre.</li>
+    <li><strong>Rendering capability.</strong> MapLibre and Mapbox GL JS share a WebGL vector-tile rendering pipeline that scales well to larger datasets and lets the map style be reconfigured at runtime (the timeline scrubber and layer toggles on this map exploit that). Leaflet's DOM-based rendering is simpler but caps out earlier as datasets grow.</li>
+    <li><strong>Migration path.</strong> The MapLibre and Mapbox GL JS APIs are nearly identical. Switching between them as institutional preferences shift is days of work, not a rebuild. The Leaflet version of this map would be a ground-up rewrite; the Mapbox version would be a few find-and-replace edits.</li>
+  </ul>
+
+  <p>The Leaflet idiom for the same map is documented at the end of this page so the prototype demonstrates fluency across both libraries rather than just one.</p>
+
+  <h2>Accessibility for an interactive map</h2>
+  <p>Interactive maps are one of the hard cases in web accessibility. The rest of this site passes WCAG 2.2 AA cleanly because the content is documents and text. A map adds two things that no other surface in the edition has: a visual encoding that does information work (color and shape distinguish soldiers), and a direct-manipulation interaction (drag-zoom-click) that doesn't map onto assistive technology gracefully.</p>
+
+  <p>The approach taken here:</p>
+  <ul>
+    <li><strong>The sidebar is the keyboard-accessible primary surface.</strong> The list to the left of the map is not decorative or duplicative — it is the parallel interface for keyboard and screen-reader users. Every letter is reachable via Tab, opens a popup on Enter, and the sidebar list and the map markers stay in sync with each other (<code>aria-current</code> updates on selection from either side). A visitor who never uses the map directly can still browse all the content and read every popup.</li>
+    <li><strong>Visual encoding is doubled.</strong> Hartwell's letters are a solid orange circle. Burroughs's are a blue circle with a paper-colored center dot — a bullseye. Color is one dimension, ring pattern is the other, so the distinction survives both color-blind viewing and monochrome printing. The legend documents the encoding in text and shows both swatches.</li>
+    <li><strong>Map region has descriptive ARIA semantics.</strong> The map is wrapped in <code>role="application"</code> with an <code>aria-label</code> that names what it shows and points to the keyboard alternative in the sidebar.</li>
+    <li><strong>Timeline scrubber is a real HTML range input</strong> with an explicit label, <code>aria-describedby</code> pointing at a live readout, and full keyboard support inherited from the platform.</li>
+    <li><strong>The map's status banner is an <code>aria-live="polite"</code> region.</strong> When Omeka becomes unreachable or a new letter is being loaded, the status updates are announced.</li>
+    <li><strong>Focus indicators on the map canvas.</strong> A three-pixel bright-gold focus ring is drawn when the canvas receives keyboard focus, so users who tab into the map have a clear indication of where focus lives.</li>
+  </ul>
+
+  <p>The honest unknowns. A screen reader user can hear the sidebar; they cannot meaningfully "hear" the map's spatial layout. Mature digital-humanities map projects address this by also producing a sonification, a tactile printout, or a structured prose summary of the geographic distribution. For this prototype, the sidebar plus the popups is the access path; a production version of this edition would add one of those richer alternatives.</p>
+
+  <h2>Live polling for new letters</h2>
+  <p>The map does not consume the static GeoJSON file alone. On initial load it parses <code>letters.geojson</code> for an instant render, and then begins a 12-second short-poll against the Omeka REST API. New records authored through the <a href="/add-letter.html">authoring form</a> appear within seconds of submission, with a brief flash animation around the new pin and an auto-opened popup.</p>
+
+  <p>This pattern was chosen over Server-Sent Events or WebSockets for the same reason the pipeline uses pure Python: simplicity matches the production deployment story. Omeka S does not natively expose SSE; Cloudflare Workers or a Node middleware would add infrastructure that this prototype doesn't need. The short-poll model degrades gracefully — if Omeka is unreachable (the local Docker stack is exposed via ngrok, which is up only when the host machine is on), the map continues to render the last good snapshot and surfaces a status banner after three consecutive failures.</p>
+
+  <p>Full pipeline notes for the live-update path are on the <a href="/authoring-pipeline.html">Authoring Pipeline page</a>.</p>
+
+  <h2>The historical raster overlay</h2>
+  <p>The map currently uses OpenStreetMap raster tiles as the base layer. A planned next step is to add a georeferenced historical map overlay sourced from the Library of Congress's <a href="https://www.loc.gov/maps/collections/civil-war-maps/" rel="external">Civil War Maps</a> collection (public domain) — a contemporary theater map of 1862 or 1863 that lets the visitor see the campaign through the cartography of the time.</p>
+
+  <p>The pipeline for that overlay, written but not yet shipped in this prototype:</p>
+  <ol>
+    <li>Download the high-resolution TIFF from the LoC.</li>
+    <li>Identify four or more ground control points (GCPs) — places identifiable on both the historical map and a modern reference (the Mississippi River, a major coastal city, a state border intersection).</li>
+    <li>Georeference with <code>rasterio</code> or <code>gdal_translate -gcp</code>, producing a coordinate-system-aware GeoTIFF.</li>
+    <li>Generate an XYZ tile pyramid with <code>gdal2tiles.py</code>, output to <code>tiles/loc-civil-war-1862/</code>.</li>
+    <li>Add the tile pyramid as a toggleable raster source in MapLibre; expose it through the existing layer-toggle UI.</li>
+  </ol>
+
+  <p>This is exactly the workflow the GIS Developer/Specialist posting names with the phrase <em>"generating and hosting raster and vector tilesets from scanned maps and primary source data."</em> The current prototype ships the structural hook (a layer-toggle control on the map page) so the addition is a no-rebuild change. The underlying pipeline is described in code at <code>scripts/georeference-loc-map.py</code> (placeholder for the next iteration).</p>
+
+  <h2>Coordinate reference system</h2>
+  <p>All geometry in this prototype is in <strong>WGS 84 (EPSG:4326)</strong>, also denoted <strong>OGC:CRS84</strong> in the GeoJSON output (the longitude-latitude variant that RFC 7946 requires). The <code>.prj</code> sidecar in the Shapefile bundle carries the full WKT description of WGS 84 so downstream consumers don't have to guess. For a production Iowa-focused dataset, reprojecting to <strong>NAD 83 Iowa State Plane (North or South zone, EPSG:26975/26976)</strong> would be the right move for accurate distance and area calculations within the state — but the source-of-truth would remain WGS 84.</p>
+
+  <h2>What would change in production</h2>
+  <ul>
+    <li><strong>Gazetteer.</strong> Replace the curated JSON with a GeoNames lookup or an LCSH-backed authority record, with project-curated overrides for unusual or contested place names. Cache the lookups so the runtime overhead is minimal.</li>
+    <li><strong>Live update.</strong> The 12-second poll is honest and resilient but rough. Production would likely use Server-Sent Events out of a Node middleware that subscribes to Omeka's <code>resource_updated</code> hook, with the same graceful-degradation banner pattern as a fallback.</li>
+    <li><strong>Tiling.</strong> Vector tiles (via <code>tippecanoe</code> or MapTiler) at the dataset's natural scale, served from institutional CDN, would replace the OSM raster basemap for a higher-volume edition. Historical raster overlays would live alongside.</li>
+    <li><strong>Big Ten Geospatial Network publication.</strong> The Shapefile and GeoJSON exports would be deposited in the BTAA-GIN aggregator with proper FGDC or ISO 19139 metadata, so other Big Ten libraries can discover and consume them.</li>
+    <li><strong>Accessibility.</strong> Add a prose-summary view of the geographic distribution at each timeline-scrubber position, generated server-side, for screen-reader-only consumers.</li>
+  </ul>
+
+  <h2 id="leaflet">Appendix: The same map in Leaflet</h2>
+  <p>For completeness, here's how the same letter layer renders in Leaflet's idiom rather than MapLibre's. The pattern is similar; the API surface is smaller and the rendering is DOM-based rather than WebGL.</p>
+
+  <pre style="background: var(--paper-soft); border: 1px solid var(--rule); border-radius: 3px; padding: 0.9rem 1rem; overflow-x: auto; font-family: 'Cascadia Code', Consolas, monospace; font-size: 0.85rem; line-height: 1.55;">// Leaflet equivalent — same letters.geojson, same gazetteer-driven popups.
+const map = L.map('map').setView([36.5, -87.0], 4.2);
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; OpenStreetMap contributors',
+}).addTo(map);
+
+const letters = await fetch('/data/letters.geojson').then(r =&gt; r.json());
+L.geoJSON(letters, {
+  pointToLayer: (feat, latlng) =&gt; L.circleMarker(latlng, {
+    radius: 8,
+    fillColor: feat.properties.creator === 'Jonathan Hartwell' ? '#b85c38' : '#2c5e7f',
+    color: '#1a1410',
+    weight: 2,
+    fillOpacity: 0.9,
+  }),
+  onEachFeature: (feat, layer) =&gt; layer.bindPopup(buildPopupHTML(feat.properties)),
+}).addTo(map);</pre>
+
+  <p>This is the version that would ship if the project's audience or hosting environment preferred Leaflet — for example, a research project that doesn't need the WebGL performance ceiling and benefits from Leaflet's smaller download footprint.</p>
+
+</main>
+
+<footer class="site-footer">
+  <nav class="footer-nav" aria-label="Footer">
+    <ul>
+      <li><a href="/">Home</a></li>
+      <li><a href="/items.html">Browse Letters</a></li>
+      <li><a href="/map.html">Map</a></li>
+      <li><a href="/add-letter.html">Add a Letter</a></li>
+      <li><a href="/methodology.html">Methodology</a></li>
+      <li><a href="/about-this-build.html">About this Build</a></li>
+    </ul>
+  </nav>
+  <div class="inner">
+    <div>
+      <h4>About this prototype</h4>
+      <p>Built as a portfolio piece for the GIS Developer/Specialist role at University of Iowa Libraries Information Technology, May 2026.</p>
+      <p><a href="/about-this-build.html">About this build &rarr;</a></p>
+    </div>
+    <div>
+      <h4>Standards used</h4>
+      <p>WGS 84 (EPSG:4326) · GeoJSON (RFC 7946) · CSV with WKT · ESRI Shapefile · Dublin Core Terms (DCMI) · WCAG 2.2 AA</p>
+    </div>
+  </div>
+</footer>
+
+<script src="/assets/js/site.js" defer></script>
+</body>
+</html>

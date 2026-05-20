@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Authoring Pipeline · Iowa Letters · A Civil War Digital Edition</title>
+<meta name="description" content="Build notes for the Iowa Letters authoring form: how a public form writes a real record to a real Omeka S backend, the role-bounded user model behind it, the live-update path to the map, and the production-vs-prototype security trade-offs." />
+<link rel="icon" type="image/x-icon" href="/favicon.ico" />
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+<link rel="manifest" href="/site.webmanifest" />
+<meta name="theme-color" content="#16202c" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/assets/css/site.css" />
+<meta name="robots" content="noindex, nofollow" />
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<div class="demo-banner">
+  Portfolio prototype for the University of Iowa Libraries GIS Developer/Specialist position, by <a href="/about-this-build.html#about-me">Meredith Sealy</a>. <a href="/add-letter.html">Back to the form.</a>
+</div>
+
+<header class="site-banner">
+  <div class="container">
+    <div class="branding">
+      <button type="button" class="seal-trigger screenshot-trigger" data-full-src="/assets/img/iowa-letters-seal.png" data-caption="Iowa Letters seal. AI-generated with Google Gemini (Nanobanana) from a prompt; background removed locally with Picasso Studio." aria-label="Open larger view: Iowa Letters seal">
+        <img class="site-seal" src="/apple-touch-icon.png" alt="Iowa Letters seal. Image generated with Google Gemini (Nanobanana)." width="180" height="180" />
+        <span class="screenshot-hover">View larger</span>
+      </button>
+      <div class="branding-text">
+        <div class="institution">A prototype for: University of Iowa Libraries · Digital Scholarship &amp; Publishing Studio</div>
+        <p class="edition-title">Iowa Letters</p>
+        <p class="tagline">A Digital Edition of Civil War Correspondence from Iowa Volunteers</p>
+      </div>
+    </div>
+  </div>
+  <nav class="primary" aria-label="Primary">
+    <div class="container">
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/items.html">Browse Letters</a></li>
+        <li><a href="/map.html">Map</a></li>
+        <li><a href="/add-letter.html">Add a Letter</a></li>
+        <li><a href="/methodology.html">Methodology</a></li>
+        <li><a href="/about-this-build.html">About this Build</a></li>
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<main id="main" tabindex="-1">
+
+  <h1>Authoring Pipeline</h1>
+  <p class="lede">Build notes for the live authoring loop: how the public form on this site writes a new letter to a real Omeka S backend, how the map picks up that letter on its next short-poll, the role-bounded user model that keeps the public form's blast radius small, and what would change between this prototype and a production deployment behind institutional SSO.</p>
+
+  <h2>Why this exists in the prototype</h2>
+  <p>The GIS Developer/Specialist posting names <em>"supporting digital mapping projects from inception through completion, including workflow optimization and legacy project migration"</em> as a core responsibility of the role. That language is the reason this authoring form exists. A Research Manager in the Studio partnering with a faculty PI on a map-driven project should not have to learn the Omeka admin in order to add a single record. They should be able to fill in a form. This is the smallest, most concrete version of that form, wired all the way through.</p>
+
+  <h2>The end-to-end loop</h2>
+
+  <pre style="background: var(--paper-soft); border: 1px solid var(--rule); border-radius: 3px; padding: 0.9rem 1rem; overflow-x: auto; font-family: 'Cascadia Code', Consolas, monospace; font-size: 0.85rem; line-height: 1.6;">┌──────────────────────────────────────────────────────────────────┐
+│  Visitor opens /add-letter.html                                  │
+│      ↓ enters IowaLetters passphrase                             │
+│      ↓ form unlocks                                              │
+│  Visitor fills in Dublin Core fields, picks a place from the     │
+│  gazetteer autocomplete, submits                                 │
+│      ↓                                                            │
+│  add-letter.js builds an Omeka REST payload (literal property    │
+│  blocks against the existing 'Civil War Letter' Resource         │
+│  Template) and POSTs to:                                          │
+│      POST /api/items?key_identity=…&key_credential=…             │
+│      ↓                                                            │
+│  Omeka S 4.1.1 writes the record to MariaDB                       │
+│  and returns the new item id                                      │
+│      ↓                                                            │
+│  add-letter.js shows the success block with a link to the map   │
+│                                                                   │
+│  ┄┄┄┄┄┄ meanwhile, in another tab ┄┄┄┄┄┄                          │
+│                                                                   │
+│  /map.html's poll loop fires every 12 seconds:                   │
+│      GET /api/items                                               │
+│      ↓ transform each item through gazetteer lookup              │
+│      ↓ diff against state.knownIds                               │
+│      → new feature triggers flyTo + flash animation + popup      │
+└──────────────────────────────────────────────────────────────────┘</pre>
+
+  <h2>The role-bounded user model</h2>
+  <p>The public form embeds an Omeka REST API key. That key belongs to a separate user, <code>iowa-letters-author</code>, created with Omeka S's <strong>Author role</strong>. The Author role is the smallest role in Omeka that can create new items; it cannot edit other users' records, cannot delete anything, cannot reach the global admin dashboard, cannot modify resource templates, vocabularies, or sites. The worst-case blast radius if the API key leaks is unwanted new-item POSTs — and those can be deleted from the admin and the key rotated by re-running a single script (<code>omeka-lab/setup-author-user.mjs</code>).</p>
+
+  <p>This is the right shape for a digital scholarship prototype that puts an authoring form in front of strangers. The admin's REST key is never near the browser-shipped code. The role-bounded key is what the form holds.</p>
+
+  <h2>The passphrase gate</h2>
+  <p>The form is gated behind a client-side passphrase check (<code>IowaLetters</code>). This is an intentional soft gate, not a real authentication boundary:</p>
+  <ul>
+    <li>The passphrase is in the source of the page. Anyone with developer tools can bypass it in seconds. It exists to keep casual visitors out, not to be a real auth layer.</li>
+    <li>The Omeka API key sits in <code>assets/js/author-key.js</code> on the deployed site. It is also visible in page source. The role-bounded user is what does the real security work.</li>
+    <li>In a production deployment at University of Iowa Libraries, both layers would be replaced with <strong>institutional Single Sign-On</strong>. The form would render only for authenticated users with the appropriate role (Studio staff, faculty PIs, project collaborators), and the API key would be a server-side session credential rather than a browser-shipped string.</li>
+  </ul>
+
+  <p>The honest framing of the prototype's security model is: the demo trusts that the hiring committee won't deliberately spam the form, and the bounded user role caps the damage if anyone does. That's enough to demonstrate the workflow; it is not enough to put in production as-is.</p>
+
+  <h2>CORS and the cross-origin path</h2>
+  <p>The static front-end is served from Netlify; the Omeka backend is exposed through ngrok. Those are different origins, which means the browser refuses cross-origin POST requests unless the server explicitly returns CORS headers. The Omeka container's nginx config (in the <a href="https://github.com/AfterRealm/iowa-omeka-lab" rel="external">iowa-omeka-lab</a> repo) was updated to:</p>
+  <ul>
+    <li>Match origins from <code>localhost</code> for local development, <code>*.netlify.app</code> for previews and production, and <code>*.ngrok.dev</code> / <code>*.ngrok-free.app</code> for tunneled access.</li>
+    <li>Return preflight responses (<code>OPTIONS 204</code>) with the appropriate <code>Access-Control-Allow-*</code> headers.</li>
+    <li>Mirror those headers on the actual <code>/api/</code> response, both at the <code>/api/</code> location block and the downstream <code>\.php$</code> location (nginx clears <code>add_header</code> on re-routing between locations, so the headers have to be declared twice).</li>
+  </ul>
+
+  <p>In production, the Omeka and the front-end would be on the same hostname (under <code>libraries.uiowa.edu</code> or similar) and CORS would be unnecessary. The prototype's CORS configuration documents the workaround pattern for the deployed-elsewhere case.</p>
+
+  <h2>The Dublin Core mapping</h2>
+  <p>The form's fields map directly onto the same Dublin Core properties the existing six letters use. The mapping table:</p>
+  <table style="border-collapse: collapse; width: 100%; max-width: 640px; font-family: 'Inter', sans-serif; font-size: 0.92rem;">
+    <thead>
+      <tr style="text-align: left; border-bottom: 2px solid var(--rule);">
+        <th scope="col" style="padding: 0.4rem 0.6rem;">Form field</th>
+        <th scope="col" style="padding: 0.4rem 0.6rem;">Dublin Core property</th>
+        <th scope="col" style="padding: 0.4rem 0.6rem;">Omeka property_id</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom: 1px solid var(--rule-soft);"><td style="padding: 0.4rem 0.6rem;">Title</td><td style="padding: 0.4rem 0.6rem;"><code>dcterms:title</code></td><td style="padding: 0.4rem 0.6rem;">1</td></tr>
+      <tr style="border-bottom: 1px solid var(--rule-soft);"><td style="padding: 0.4rem 0.6rem;">Author / soldier</td><td style="padding: 0.4rem 0.6rem;"><code>dcterms:creator</code></td><td style="padding: 0.4rem 0.6rem;">2</td></tr>
+      <tr style="border-bottom: 1px solid var(--rule-soft);"><td style="padding: 0.4rem 0.6rem;">Date written</td><td style="padding: 0.4rem 0.6rem;"><code>dcterms:date</code></td><td style="padding: 0.4rem 0.6rem;">7</td></tr>
+      <tr style="border-bottom: 1px solid var(--rule-soft);"><td style="padding: 0.4rem 0.6rem;">Place written from</td><td style="padding: 0.4rem 0.6rem;"><code>dcterms:spatial</code></td><td style="padding: 0.4rem 0.6rem;">40</td></tr>
+      <tr style="border-bottom: 1px solid var(--rule-soft);"><td style="padding: 0.4rem 0.6rem;">Transcription</td><td style="padding: 0.4rem 0.6rem;"><code>dcterms:description</code></td><td style="padding: 0.4rem 0.6rem;">4</td></tr>
+      <tr style="border-bottom: 1px solid var(--rule-soft);"><td style="padding: 0.4rem 0.6rem;">(implicit) Type</td><td style="padding: 0.4rem 0.6rem;"><code>dcterms:type</code></td><td style="padding: 0.4rem 0.6rem;">8</td></tr>
+      <tr style="border-bottom: 1px solid var(--rule-soft);"><td style="padding: 0.4rem 0.6rem;">(implicit) Language</td><td style="padding: 0.4rem 0.6rem;"><code>dcterms:language</code></td><td style="padding: 0.4rem 0.6rem;">12</td></tr>
+      <tr style="border-bottom: 1px solid var(--rule-soft);"><td style="padding: 0.4rem 0.6rem;">(implicit) Rights</td><td style="padding: 0.4rem 0.6rem;"><code>dcterms:rights</code></td><td style="padding: 0.4rem 0.6rem;">15</td></tr>
+      <tr><td style="padding: 0.4rem 0.6rem;">(implicit) Source</td><td style="padding: 0.4rem 0.6rem;"><code>dcterms:source</code></td><td style="padding: 0.4rem 0.6rem;">11</td></tr>
+    </tbody>
+  </table>
+
+  <p>Regiment, company, and addressee are stored on the item record in extension properties; in a production deployment they would either be folded into a project-scoped custom vocabulary or, where appropriate, mapped to <a href="https://www.loc.gov/marc/relators/" rel="external">MARC relator codes</a>.</p>
+
+  <h2>Live update from form to map</h2>
+  <p>The two pages are decoupled. The form doesn't notify the map directly; instead, the map page polls Omeka on a 12-second cadence and diffs the returned items against the set of letter ids it already knows about. New ids trigger a flyTo, a brief yellow pulse animation around the new pin, and an auto-opened popup. Polling is honest about its limits: it shows a "Live updates paused" banner after three consecutive Omeka failures.</p>
+
+  <p>The query-string parameter <code>?focus=&lt;id&gt;</code> on the map URL tells the page to wait for that specific item to land (up to thirty seconds) and select it automatically. The form's success block links to <code>/map.html?focus=&lt;id&gt;</code>, so a visitor who submits a letter and clicks "Open the map to see it" lands on a map that's already focused on their contribution.</p>
+
+  <h2>What would change in production</h2>
+  <ul>
+    <li><strong>Authentication.</strong> Replace the passphrase gate with University of Iowa institutional SSO. The Omeka API key becomes a server-side session credential, not a browser-shipped string.</li>
+    <li><strong>Authorization.</strong> Per-project authoring permissions through Omeka's site-scoped user roles, so a faculty PI's collaborators can author against their project's templates without inheriting access to other Studio projects.</li>
+    <li><strong>Review queue.</strong> New items POST to a draft queue rather than directly to the public site. A Studio staff member reviews and approves before the new record becomes public on the map. This is the workflow most digital scholarship projects actually want.</li>
+    <li><strong>Live update.</strong> Replace the 12-second poll with Server-Sent Events from a Node middleware that subscribes to Omeka's <code>resource_updated</code> hook. The graceful-degradation banner pattern stays as a fallback.</li>
+    <li><strong>Audit trail.</strong> Every form submission carries a record of who submitted it, from what IP, with what authenticated identity. Omeka has the columns; institutional SSO provides the identity.</li>
+    <li><strong>Validation.</strong> Server-side schema validation on the Omeka side, including required-field enforcement, vocabulary validation against the gazetteer, and reject-on-out-of-range date or geometry. Most of this is one Omeka module away.</li>
+  </ul>
+
+  <h2>Repo layout for the authoring side</h2>
+  <pre style="background: var(--paper-soft); border: 1px solid var(--rule); border-radius: 3px; padding: 0.9rem 1rem; overflow-x: auto; font-family: 'Cascadia Code', Consolas, monospace; font-size: 0.85rem; line-height: 1.6;">iowa-demo/
+  add-letter.html              ← gated form + success block
+  assets/
+    js/
+      add-letter.js            ← gate, validate, build payload, POST, status
+      author-key.example.js    ← in repo (placeholder values)
+      author-key.js            ← gitignored, real KEY_ID + KEY_CRED
+  data/
+    gazetteer.json             ← shared with the map's autocomplete
+
+iowa-omeka-lab/
+  nginx.conf                   ← CORS rules for /api/ and the .php handler
+  setup-author-user.mjs        ← creates iowa-letters-author + generates key
+  author-credentials.env       ← gitignored, output of setup-author-user.mjs</pre>
+
+  <p>The <code>author-key.js</code> file is gitignored. For the Netlify production deploy it's generated at build time from environment variables (<code>OMEKA_AUTHOR_KEY_ID</code> and <code>OMEKA_AUTHOR_KEY_CRED</code>) by a small build script — so the key lives in Netlify's encrypted env-var store, not in the repo.</p>
+
+</main>
+
+<footer class="site-footer">
+  <nav class="footer-nav" aria-label="Footer">
+    <ul>
+      <li><a href="/">Home</a></li>
+      <li><a href="/items.html">Browse Letters</a></li>
+      <li><a href="/map.html">Map</a></li>
+      <li><a href="/add-letter.html">Add a Letter</a></li>
+      <li><a href="/methodology.html">Methodology</a></li>
+      <li><a href="/about-this-build.html">About this Build</a></li>
+    </ul>
+  </nav>
+  <div class="inner">
+    <div>
+      <h4>About this prototype</h4>
+      <p>Built as a portfolio piece for the GIS Developer/Specialist role at University of Iowa Libraries Information Technology, May 2026.</p>
+      <p><a href="/about-this-build.html">About this build &rarr;</a></p>
+    </div>
+    <div>
+      <h4>Standards used</h4>
+      <p>Dublin Core Terms (DCMI) · Omeka S REST API · CORS · WGS 84 (EPSG:4326) · WCAG 2.2 AA</p>
+    </div>
+  </div>
+</footer>
+
+<script src="/assets/js/site.js" defer></script>
+</body>
+</html>

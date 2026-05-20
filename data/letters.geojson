@@ -1,0 +1,186 @@
+{
+  "type": "FeatureCollection",
+  "name": "Iowa Letters — letter origins",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "metadata": {
+    "generated_at": "2026-05-20T14:17:15+00:00",
+    "source": "data/items.json + data/gazetteer.json",
+    "license": "CC0 1.0 (illustrative prototype content).",
+    "note": "Each Feature is the geocoded origin of a letter. The home anchor for each letter is carried as home_lat / home_lon properties (not as a second geometry) for portability across formats."
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "id": 1,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.5776,
+          41.5236
+        ]
+      },
+      "properties": {
+        "id": 1,
+        "title": "Letter from Camp McClellan, Davenport, Iowa",
+        "creator": "Jonathan Hartwell",
+        "date": "1862-09-14",
+        "regiment": "16th Iowa Volunteer Infantry",
+        "company": "Company D",
+        "addressee": "Sarah Hartwell, Cedar County, Iowa",
+        "place_canonical": "Davenport, Iowa, United States",
+        "place_id": "davenport-ia",
+        "theater": "iowa-mustering",
+        "home_canonical": "Cedar County, Iowa, United States",
+        "home_id": "cedar-county-ia",
+        "home_lat": 41.7717,
+        "home_lon": -91.133,
+        "transcription": "Dear Sarah, we arrived at Camp McClellan late on the eleventh after two days' march. The boys are in good spirits but rations are thin and the rain has not let up. The Colonel keeps us at drill from dawn till after supper. I think often of the farm. Tell Father the south field will need to be fallowed if I am not home by spring."
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 2,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.8779,
+          32.3526
+        ]
+      },
+      "properties": {
+        "id": 2,
+        "title": "Letter from a soldier of the 16th Iowa near Vicksburg",
+        "creator": "Elias Burroughs",
+        "date": "1863-05-19",
+        "regiment": "16th Iowa Volunteer Infantry",
+        "company": "Company B",
+        "addressee": "Anna Burroughs (mother), Linn County, Iowa",
+        "place_canonical": "Vicksburg, Mississippi, United States",
+        "place_id": "vicksburg-ms",
+        "theater": "western",
+        "home_canonical": "Linn County, Iowa, United States",
+        "home_id": "linn-county-ia",
+        "home_lat": 42.0792,
+        "home_lon": -91.597,
+        "transcription": "Mother, there is to be a great fight before long, that much is certain. The pickets have been firing across the bluff for three days. I am tired in a way I cannot describe to you but my health is good. If anything should happen to me, see that Jacob does not enlist. He is too small still and his lungs were never strong."
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 3,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.388,
+          33.749
+        ]
+      },
+      "properties": {
+        "id": 3,
+        "title": "Letter written during the Atlanta Campaign",
+        "creator": "Jonathan Hartwell",
+        "date": "1864-07-22",
+        "regiment": "16th Iowa Volunteer Infantry",
+        "company": "Company D",
+        "addressee": "Sarah Hartwell, Cedar County, Iowa",
+        "place_canonical": "Atlanta, Georgia, United States",
+        "place_id": "atlanta-ga",
+        "theater": "atlanta-campaign",
+        "home_canonical": "Cedar County, Iowa, United States",
+        "home_id": "cedar-county-ia",
+        "home_lat": 41.7717,
+        "home_lon": -91.133,
+        "transcription": "Dear Sarah, we have been at it three weeks now. General Sherman pushes us hard and the Rebs do not give an inch easily. I lost Henry Coombs yesterday. He was always more brother to me than not. I cannot write more tonight. Kiss the girls for me."
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 4,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.049,
+          35.1495
+        ]
+      },
+      "properties": {
+        "id": 4,
+        "title": "Letter written from a Union hospital in Memphis",
+        "creator": "Elias Burroughs",
+        "date": "1863-07-08",
+        "regiment": "16th Iowa Volunteer Infantry",
+        "company": "Company B",
+        "addressee": "Anna Burroughs (mother), Linn County, Iowa",
+        "place_canonical": "Memphis, Tennessee, United States",
+        "place_id": "memphis-tn",
+        "theater": "western",
+        "home_canonical": "Linn County, Iowa, United States",
+        "home_id": "linn-county-ia",
+        "home_lat": 42.0792,
+        "home_lon": -91.597,
+        "transcription": "Mother, the fever has broken. The surgeon says I will have my leg though it will not be as it was. I am alive and that is more than many of our boys can say after the works at Vicksburg. The Sisters here have been very kind."
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 5,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -81.0912,
+          32.0809
+        ]
+      },
+      "properties": {
+        "id": 5,
+        "title": "Christmas letter from Savannah",
+        "creator": "Jonathan Hartwell",
+        "date": "1864-12-25",
+        "regiment": "16th Iowa Volunteer Infantry",
+        "company": "Company D",
+        "addressee": "Sarah Hartwell, Cedar County, Iowa",
+        "place_canonical": "Savannah, Georgia, United States",
+        "place_id": "savannah-ga",
+        "theater": "march-to-the-sea",
+        "home_canonical": "Cedar County, Iowa, United States",
+        "home_id": "cedar-county-ia",
+        "home_lat": 41.7717,
+        "home_lon": -91.133,
+        "transcription": "Sarah, a Christmas to you and the girls. We marched in to Savannah six days ago and the city has surrendered. General Sherman has given the city to Mr. Lincoln as a present. The boys say the war is nearly done. I begin to hope it is true. I begin to dare to plan for after."
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 6,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.9928,
+          35.3849
+        ]
+      },
+      "properties": {
+        "id": 6,
+        "title": "Final preserved letter, written near Goldsboro",
+        "creator": "Elias Burroughs",
+        "date": "1865-03-30",
+        "regiment": "16th Iowa Volunteer Infantry",
+        "company": "Company B",
+        "addressee": "Anna Burroughs (mother), Linn County, Iowa",
+        "place_canonical": "Goldsboro, North Carolina, United States",
+        "place_id": "goldsboro-nc",
+        "theater": "carolinas-campaign",
+        "home_canonical": "Linn County, Iowa, United States",
+        "home_id": "linn-county-ia",
+        "home_lat": 42.0792,
+        "home_lon": -91.597,
+        "transcription": "Mother, word is the Rebs have nothing left. We expect to be paid off and sent home before the summer. I find I do not know what I will do when I am back. I have grown old in three years. But I am coming home, Mother. I am coming home."
+      }
+    }
+  ]
+}

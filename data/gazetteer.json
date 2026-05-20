@@ -1,0 +1,402 @@
+{
+  "@context": {
+    "dcterms": "http://purl.org/dc/terms/",
+    "geo": "http://www.w3.org/2003/01/geo/wgs84_pos#",
+    "skos": "http://www.w3.org/2004/02/skos/core#"
+  },
+  "@id": "/data/gazetteer.json",
+  "name": "Iowa Letters Gazetteer",
+  "description": "A curated controlled vocabulary of place names referenced in or contemporary with the Iowa Letters digital edition prototype. Each entry maps a canonical place name to WGS 84 (EPSG:4326) coordinates and groups it by Civil War theater of operations. This file is the source of truth for client-side geocoding in the prototype's map view and authoring UI; in a production digital scholarship workflow, this gazetteer would be replaced by the GeoNames API or by Library of Congress Subject Headings backed by NAF authority records.",
+  "license": "CC0 1.0 (public domain). Coordinates are approximate and rounded to four decimal places (roughly eleven meters of precision).",
+  "crs": "EPSG:4326",
+  "places": [
+    {
+      "id": "davenport-ia",
+      "canonical": "Davenport, Iowa, United States",
+      "aliases": ["Camp McClellan", "Davenport", "Davenport, IA"],
+      "lat": 41.5236,
+      "lon": -90.5776,
+      "kind": "city",
+      "theater": "iowa-mustering",
+      "note": "Camp McClellan was the principal training camp for Iowa volunteer infantry, situated on the Mississippi River at Davenport."
+    },
+    {
+      "id": "keokuk-ia",
+      "canonical": "Keokuk, Iowa, United States",
+      "aliases": ["Keokuk"],
+      "lat": 40.3970,
+      "lon": -91.3849,
+      "kind": "city",
+      "theater": "iowa-mustering",
+      "note": "Major southern Iowa departure point; many regiments boarded river transport here for the Western Theater."
+    },
+    {
+      "id": "iowa-city-ia",
+      "canonical": "Iowa City, Iowa, United States",
+      "aliases": ["Iowa City"],
+      "lat": 41.6611,
+      "lon": -91.5302,
+      "kind": "city",
+      "theater": "iowa-mustering"
+    },
+    {
+      "id": "dubuque-ia",
+      "canonical": "Dubuque, Iowa, United States",
+      "aliases": ["Dubuque"],
+      "lat": 42.5006,
+      "lon": -90.6646,
+      "kind": "city",
+      "theater": "iowa-mustering"
+    },
+    {
+      "id": "burlington-ia",
+      "canonical": "Burlington, Iowa, United States",
+      "aliases": ["Burlington", "Burlington, IA"],
+      "lat": 40.8076,
+      "lon": -91.1129,
+      "kind": "city",
+      "theater": "iowa-mustering"
+    },
+    {
+      "id": "council-bluffs-ia",
+      "canonical": "Council Bluffs, Iowa, United States",
+      "aliases": ["Council Bluffs"],
+      "lat": 41.2620,
+      "lon": -95.8608,
+      "kind": "city",
+      "theater": "iowa-mustering"
+    },
+    {
+      "id": "des-moines-ia",
+      "canonical": "Des Moines, Iowa, United States",
+      "aliases": ["Des Moines"],
+      "lat": 41.5868,
+      "lon": -93.6250,
+      "kind": "city",
+      "theater": "iowa-mustering"
+    },
+    {
+      "id": "cedar-county-ia",
+      "canonical": "Cedar County, Iowa, United States",
+      "aliases": ["Cedar County"],
+      "lat": 41.7717,
+      "lon": -91.1330,
+      "kind": "county",
+      "theater": "iowa-home",
+      "note": "Approximate county centroid. Home of the Hartwell family in the prototype."
+    },
+    {
+      "id": "linn-county-ia",
+      "canonical": "Linn County, Iowa, United States",
+      "aliases": ["Linn County"],
+      "lat": 42.0792,
+      "lon": -91.5970,
+      "kind": "county",
+      "theater": "iowa-home",
+      "note": "Approximate county centroid. Home of the Burroughs family in the prototype."
+    },
+    {
+      "id": "black-hawk-county-ia",
+      "canonical": "Black Hawk County, Iowa, United States",
+      "aliases": ["Black Hawk County"],
+      "lat": 42.4707,
+      "lon": -92.3084,
+      "kind": "county",
+      "theater": "iowa-home"
+    },
+    {
+      "id": "polk-county-ia",
+      "canonical": "Polk County, Iowa, United States",
+      "aliases": ["Polk County"],
+      "lat": 41.6850,
+      "lon": -93.5832,
+      "kind": "county",
+      "theater": "iowa-home"
+    },
+    {
+      "id": "cairo-il",
+      "canonical": "Cairo, Illinois, United States",
+      "aliases": ["Cairo"],
+      "lat": 37.0050,
+      "lon": -89.1762,
+      "kind": "city",
+      "theater": "western",
+      "note": "Confluence of the Ohio and Mississippi; a primary western forward base for Union forces."
+    },
+    {
+      "id": "st-louis-mo",
+      "canonical": "St. Louis, Missouri, United States",
+      "aliases": ["St. Louis", "Saint Louis"],
+      "lat": 38.6270,
+      "lon": -90.1994,
+      "kind": "city",
+      "theater": "western"
+    },
+    {
+      "id": "fort-donelson-tn",
+      "canonical": "Fort Donelson, Tennessee, United States",
+      "aliases": ["Fort Donelson", "Dover, Tennessee"],
+      "lat": 36.4886,
+      "lon": -87.8581,
+      "kind": "fortification",
+      "theater": "western"
+    },
+    {
+      "id": "shiloh-tn",
+      "canonical": "Shiloh, Tennessee, United States",
+      "aliases": ["Pittsburg Landing", "Shiloh"],
+      "lat": 35.1395,
+      "lon": -88.3447,
+      "kind": "battlefield",
+      "theater": "western"
+    },
+    {
+      "id": "corinth-ms",
+      "canonical": "Corinth, Mississippi, United States",
+      "aliases": ["Corinth"],
+      "lat": 34.9343,
+      "lon": -88.5222,
+      "kind": "city",
+      "theater": "western"
+    },
+    {
+      "id": "iuka-ms",
+      "canonical": "Iuka, Mississippi, United States",
+      "aliases": ["Iuka"],
+      "lat": 34.8120,
+      "lon": -88.1903,
+      "kind": "city",
+      "theater": "western"
+    },
+    {
+      "id": "memphis-tn",
+      "canonical": "Memphis, Tennessee, United States",
+      "aliases": ["Memphis"],
+      "lat": 35.1495,
+      "lon": -90.0490,
+      "kind": "city",
+      "theater": "western"
+    },
+    {
+      "id": "holly-springs-ms",
+      "canonical": "Holly Springs, Mississippi, United States",
+      "aliases": ["Holly Springs"],
+      "lat": 34.7676,
+      "lon": -89.4487,
+      "kind": "city",
+      "theater": "western"
+    },
+    {
+      "id": "vicksburg-ms",
+      "canonical": "Vicksburg, Mississippi, United States",
+      "aliases": ["Vicksburg", "Near Vicksburg, Mississippi, United States"],
+      "lat": 32.3526,
+      "lon": -90.8779,
+      "kind": "city",
+      "theater": "western",
+      "note": "The 47-day siege ended 4 July 1863 with Confederate surrender; Iowa regiments were heavily engaged."
+    },
+    {
+      "id": "jackson-ms",
+      "canonical": "Jackson, Mississippi, United States",
+      "aliases": ["Jackson"],
+      "lat": 32.2988,
+      "lon": -90.1848,
+      "kind": "city",
+      "theater": "western"
+    },
+    {
+      "id": "nashville-tn",
+      "canonical": "Nashville, Tennessee, United States",
+      "aliases": ["Nashville"],
+      "lat": 36.1627,
+      "lon": -86.7816,
+      "kind": "city",
+      "theater": "western"
+    },
+    {
+      "id": "murfreesboro-tn",
+      "canonical": "Murfreesboro, Tennessee, United States",
+      "aliases": ["Stones River", "Murfreesboro"],
+      "lat": 35.8456,
+      "lon": -86.3903,
+      "kind": "city",
+      "theater": "western"
+    },
+    {
+      "id": "chattanooga-tn",
+      "canonical": "Chattanooga, Tennessee, United States",
+      "aliases": ["Chattanooga"],
+      "lat": 35.0456,
+      "lon": -85.3097,
+      "kind": "city",
+      "theater": "western"
+    },
+    {
+      "id": "lookout-mountain-tn",
+      "canonical": "Lookout Mountain, Tennessee, United States",
+      "aliases": ["Lookout Mountain"],
+      "lat": 35.0079,
+      "lon": -85.3439,
+      "kind": "battlefield",
+      "theater": "western"
+    },
+    {
+      "id": "resaca-ga",
+      "canonical": "Resaca, Georgia, United States",
+      "aliases": ["Resaca"],
+      "lat": 34.5773,
+      "lon": -84.9466,
+      "kind": "battlefield",
+      "theater": "atlanta-campaign"
+    },
+    {
+      "id": "kennesaw-mountain-ga",
+      "canonical": "Kennesaw Mountain, Georgia, United States",
+      "aliases": ["Kennesaw", "Kennesaw Mountain"],
+      "lat": 33.9776,
+      "lon": -84.5793,
+      "kind": "battlefield",
+      "theater": "atlanta-campaign"
+    },
+    {
+      "id": "atlanta-ga",
+      "canonical": "Atlanta, Georgia, United States",
+      "aliases": ["Atlanta", "Near Atlanta, Georgia, United States"],
+      "lat": 33.7490,
+      "lon": -84.3880,
+      "kind": "city",
+      "theater": "atlanta-campaign"
+    },
+    {
+      "id": "jonesborough-ga",
+      "canonical": "Jonesborough, Georgia, United States",
+      "aliases": ["Jonesborough", "Jonesboro"],
+      "lat": 33.5215,
+      "lon": -84.3540,
+      "kind": "city",
+      "theater": "atlanta-campaign"
+    },
+    {
+      "id": "milledgeville-ga",
+      "canonical": "Milledgeville, Georgia, United States",
+      "aliases": ["Milledgeville"],
+      "lat": 33.0801,
+      "lon": -83.2321,
+      "kind": "city",
+      "theater": "march-to-the-sea"
+    },
+    {
+      "id": "savannah-ga",
+      "canonical": "Savannah, Georgia, United States",
+      "aliases": ["Savannah"],
+      "lat": 32.0809,
+      "lon": -81.0912,
+      "kind": "city",
+      "theater": "march-to-the-sea",
+      "note": "Surrendered to Sherman 21 December 1864."
+    },
+    {
+      "id": "columbia-sc",
+      "canonical": "Columbia, South Carolina, United States",
+      "aliases": ["Columbia"],
+      "lat": 34.0007,
+      "lon": -81.0348,
+      "kind": "city",
+      "theater": "carolinas-campaign"
+    },
+    {
+      "id": "bentonville-nc",
+      "canonical": "Bentonville, North Carolina, United States",
+      "aliases": ["Bentonville"],
+      "lat": 35.3068,
+      "lon": -78.3208,
+      "kind": "battlefield",
+      "theater": "carolinas-campaign"
+    },
+    {
+      "id": "goldsboro-nc",
+      "canonical": "Goldsboro, North Carolina, United States",
+      "aliases": ["Goldsboro", "Near Goldsboro, North Carolina, United States"],
+      "lat": 35.3849,
+      "lon": -77.9928,
+      "kind": "city",
+      "theater": "carolinas-campaign"
+    },
+    {
+      "id": "raleigh-nc",
+      "canonical": "Raleigh, North Carolina, United States",
+      "aliases": ["Raleigh"],
+      "lat": 35.7796,
+      "lon": -78.6382,
+      "kind": "city",
+      "theater": "carolinas-campaign"
+    },
+    {
+      "id": "washington-dc",
+      "canonical": "Washington, District of Columbia, United States",
+      "aliases": ["Washington", "Washington, D.C.", "Washington DC"],
+      "lat": 38.9072,
+      "lon": -77.0369,
+      "kind": "city",
+      "theater": "eastern"
+    },
+    {
+      "id": "richmond-va",
+      "canonical": "Richmond, Virginia, United States",
+      "aliases": ["Richmond"],
+      "lat": 37.5407,
+      "lon": -77.4360,
+      "kind": "city",
+      "theater": "eastern"
+    },
+    {
+      "id": "petersburg-va",
+      "canonical": "Petersburg, Virginia, United States",
+      "aliases": ["Petersburg"],
+      "lat": 37.2279,
+      "lon": -77.4019,
+      "kind": "city",
+      "theater": "eastern"
+    },
+    {
+      "id": "appomattox-va",
+      "canonical": "Appomattox Court House, Virginia, United States",
+      "aliases": ["Appomattox", "Appomattox Court House"],
+      "lat": 37.3776,
+      "lon": -78.7964,
+      "kind": "battlefield",
+      "theater": "eastern"
+    }
+  ],
+  "theaters": {
+    "iowa-mustering": {
+      "label": "Iowa mustering and training",
+      "description": "Cities in Iowa where regiments were raised, trained, and embarked. Camp McClellan at Davenport was the principal training depot."
+    },
+    "iowa-home": {
+      "label": "Iowa home counties",
+      "description": "County centroids in Iowa. Used in this prototype to anchor the home end of the soldier-correspondent line for each letter."
+    },
+    "western": {
+      "label": "Western Theater",
+      "description": "The campaigns in Kentucky, Tennessee, Mississippi, and Alabama, including the Vicksburg campaign of 1862-1863."
+    },
+    "atlanta-campaign": {
+      "label": "Atlanta Campaign",
+      "description": "Sherman's drive from northwest Georgia to Atlanta, May to September 1864."
+    },
+    "march-to-the-sea": {
+      "label": "March to the Sea",
+      "description": "Sherman's march from Atlanta to Savannah, November to December 1864."
+    },
+    "carolinas-campaign": {
+      "label": "Carolinas Campaign",
+      "description": "Sherman's march north through South and North Carolina, January to April 1865."
+    },
+    "eastern": {
+      "label": "Eastern Theater",
+      "description": "Virginia and the Maryland frontier; included here for completeness and for letters that may reference distant events."
+    }
+  }
+}

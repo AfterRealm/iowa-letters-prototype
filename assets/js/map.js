@@ -681,9 +681,9 @@
       setupTimeline();
       setupToggles();
 
-      // Begin live polling. First poll happens almost immediately so newly
-      // authored letters land within a few seconds of submission.
-      setTimeout(pollOmeka, 2000);
+      // Begin live polling. Fire the first poll immediately so deep-link
+      // focus (and live-update detection) doesn't wait on a timer.
+      pollOmeka();
       state.pollTimer = setInterval(pollOmeka, POLL_INTERVAL_MS);
 
       // If the URL has ?focus=ID, wait until the first Omeka poll has
@@ -700,7 +700,7 @@
             selectFeature(wantId, { fly: true });
             return;
           }
-          if (performance.now() - start < 30000) setTimeout(tryFocus, 800);
+          if (performance.now() - start < 30000) setTimeout(tryFocus, 250);
         };
         tryFocus();
       }
